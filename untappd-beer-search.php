@@ -129,9 +129,9 @@ function ubs_render_search_page() {
 
 	if ( is_wp_error( $search_result ) ) {
 		$search_result = $search_result->get_error_message();
-	} elseif ( $search_result['found'] === 0 ) {
+	} elseif ( isset( $search_result['found'] ) && $search_result['found'] === 0 ) {
 		$search_result = __( 'No beers found.', 'ubs' );
-	} else {
+	} elseif ( false === empty( $search_result ) ) {
 		$search_result = ubs_render_search_results( $search_result );
 	}
 
