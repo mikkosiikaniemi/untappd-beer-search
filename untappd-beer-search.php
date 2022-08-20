@@ -191,9 +191,15 @@ function ubs_render_search_results( $result_array ) {
 	$html .= '<th>';
 	$html .= __( 'Beer Name', 'ubs' );
 	$html .= '</th>';
-	// $html .= '<th>';
-	// $html .= __( 'Have Had?', 'ubs' );
-	// $html .= '</th>';
+	$html .= '<th>';
+	$html .= __( 'Beer Style', 'ubs' );
+	$html .= '</th>';
+	$html .= '<th>';
+	$html .= __( 'ABV%', 'ubs' );
+	$html .= '</th>';
+	$html .= '<th>';
+	$html .= __( 'Already saved?', 'ubs' );
+	$html .= '</th>';
 	$html .= '<th>';
 	$html .= __( 'Save', 'ubs' );
 	$html .= '</th>';
@@ -211,20 +217,26 @@ function ubs_render_search_results( $result_array ) {
 		$html .= '<td>';
 		$html .= $beer['beer']['beer_name'];
 		$html .= '</td>';
+		$html .= '<td>';
+		$html .= $beer['beer']['beer_style'];
+		$html .= '</td>';
+		$html .= '<td>';
+		$html .= number_format( $beer['beer']['beer_abv'], 1 );
+		$html .= '</td>';
 
-		// $html .= '<td>';
-		// if ( $beer['have_had'] === true ) {
-		// $html .= __( 'Yes', 'ubs' );
-		// } else {
-		// $html .= __( '—', 'ubs' );
-		// }
-		// $html .= '</td>';
+		$html .= '<td>';
+		if ( false !== get_post_status( $beer['beer']['bid'] ) ) {
+			$html .= __( 'Yes', 'ubs' );
+		} else {
+			$html .= __( '—', 'ubs' );
+		}
+		$html .= '</td>';
 
 		$html .= '<td>';
 		$html .= '<input type="checkbox" name="beer-id[]" value="' . $beer['beer']['bid'] . '"';
-		// if ( $beer['have_had'] === false ) {
-		// $html .= ' checked="checked"';
-		// }
+		if ( false === get_post_status( $beer['beer']['bid'] ) ) {
+			$html .= ' checked="checked"';
+		}
 		$html .= '>';
 		$html .= '</td>';
 		$html .= '</tr>';
@@ -275,13 +287,30 @@ add_action( 'admin_post_ubs_save', 'ubs_save_beers' );
  */
 function ubs_save_beer( $beer_data ) {
 
-	$post_arr = array(
+	$post_data = array(
 		'post_type'    => 'beer',
-		'post_title'   => $beer_data['brewery']['brewery_name'] . ' ' . $beer_data['beer_name'],
-		'post_content' => $beer_data['beer_description'],
+		'post_title'   => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] . ' ' . $beer_data['beer_name'] ),
+		'post_content' => wp_strip_all_tags( $beer_data['beer_description'] ),
+		'import_id'    => absint( $beer_data['bid'] ),
+		'post_status'  => 'publish',
 	);
 
-	wp_insert_post( $post_arr );
+	// Make a copy of the beer data, to be saved as post meta.
+	$post_meta = $beer_data;
+
+	// Unset certain meta keys as these are unnecessary to be saved.
+	unset( $post_meta['media'] );
+	unset( $post_meta['checkins'] );
+	unset( $post_meta['similar'] );
+	unset( $post_meta['friends'] );
+	$post_data['meta_input'] = $post_meta;
+
+	// If the beer has been saved before, set the ID so that the post can be updated.
+	if ( false !== get_post_status( $beer_data['bid'] ) ) {
+		$post_data['ID'] = $beer_data['bid'];
+	}
+
+	wp_insert_post( $post_data );
 }
 
 /**
@@ -419,3 +448,74 @@ function ubs_render_options_page() {
 	</div>
 	<?php
 }
+
+/**
+ * Add custom colums to beer post type admin listing.
+ *
+ * @param  array $columns Original colums.
+ * @return array $columns Modified columns.
+ */
+function ubs_set_custom_beer_columns( $columns ) {
+	unset( $columns['date'] );
+	$columns['style']  = __( 'Style', 'ubs' );
+	$columns['abv']    = __( 'ABV%', 'ubs' );
+	$columns['rating'] = __( 'Rating', 'ubs' );
+
+	return $columns;
+}
+add_filter( 'manage_beer_posts_columns', 'ubs_set_custom_beer_columns' );
+
+/**
+ * Populate custom colums to beer post type admin listing.
+ *
+ * @param  string $column  Column slug.
+ * @param  int    $post_id Post ID.
+ * @return void
+ */
+function ubs_populate_custom_beer_columns( $column, $post_id ) {
+	switch ( $column ) {
+		case 'rating':
+			echo number_format( get_post_meta( $post_id, 'rating_score', true ), 2 );
+			break;
+		case 'abv':
+			echo number_format( get_post_meta( $post_id, 'beer_abv', true ), 1 );
+			break;
+		case 'style':
+			echo esc_attr( get_post_meta( $post_id, 'beer_style', true ) );
+			break;
+	}
+}
+add_action( 'manage_beer_posts_custom_column', 'ubs_populate_custom_beer_columns', 10, 2 );
+
+/**
+ * Register sortable columns.
+ *
+ * @param  array $columns Original colums.
+ * @return array $columns Modified columns.
+ */
+function ubs_register_sortable_columns( $columns ) {
+	$columns['rating'] = 'rating';
+	return $columns;
+}
+add_filter( 'manage_edit-beer_sortable_columns', 'ubs_register_sortable_columns' );
+
+/**
+ * Make custom columns (populated from meta data) sortable.
+ *
+ * @param  [type] $query
+ * @return void
+ */
+function ubs_sort_by_custom_column( $query ) {
+
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	$orderby = $query->get( 'orderby' );
+
+	if ( 'rating' === $orderby ) {
+		$query->set( 'meta_key', 'rating_score' );
+		$query->set( 'orderby', 'meta_value_num' );
+	}
+}
+add_action( 'pre_get_posts', 'ubs_sort_by_custom_column' );
