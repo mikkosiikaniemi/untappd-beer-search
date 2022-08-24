@@ -552,7 +552,7 @@ add_action( 'admin_enqueue_scripts', 'ubs_enqueue_scripts' );
 function ubs_process_ajax_search_results() {
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_search' ) ) {
-		wp_die( esc_attr__( 'Permission check failed.', 'ubs' ) );
+		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
 	}
 
 	if ( false === isset( $_POST['beer_name'] ) ) {
@@ -583,7 +583,7 @@ function ubs_process_ajax_save_results() {
 	vincit_wp_debug( $searcharray );
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_save' ) ) {
-		wp_die( esc_attr__( 'Permission check failed.', 'ubs' ) );
+		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
 	}
 
 	wp_die();
