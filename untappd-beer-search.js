@@ -22,19 +22,36 @@ jQuery(document).ready(function ($) {
 	});
 
 	// Process save form submit action.
-	$(document).on( 'submit', '#ubs-search-results', function( e )  {
+	$(document).on('submit', '#ubs-search-results', function (e) {
 
 		$("#ubs-search-results .spinner").addClass("is-active");
 		$("#ubs-search-results [type=submit]").attr("disabled", true);
 
 		var data = {
 			action: 'ubs_save_selected_results',
-			beer_name: $('input[name="beer-id[]"]:checked').serialize(),
+			beer_ids: $('input[name="beer-id[]"]:checked').serialize(),
 			ubs_nonce: $('#ubs_save_nonce').val(),
 		};
 
+		$('input[name="beer-id[]"]:checked').each(function (e) {
+			id = $(this).attr("id");
+			id = id.replace('beer-check-', '');
+			$('#beer-save-' + id).html('<span class="spinner is-active" style="float:none; height: 1em; width: 1em; background-size: 1em; margin:0;"></span>');
+		});
+
+
 		$.post(ajaxurl, data, function (response) {
-			//$('#ubs-untappd-response').html(response);
+
+			var results = $.parseJSON(response);
+			$.each(results, function (beer_id, status) {
+				if ($.isNumeric(status)) {
+					$('#beer-check-' + beer_id).prop("checked", true).attr("disabled", true);
+					$('#beer-save-' + beer_id).html('☑️');
+				} else {
+					$('#beer-save-' + beer_id).html(status);
+				}
+			});
+
 			$("#ubs-search-results .spinner").removeClass("is-active");
 			$("#ubs-search-results [type=submit]").attr("disabled", false);
 		});
