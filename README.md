@@ -8,7 +8,7 @@ A WordPress plugin for searching [Untappd](https://untappd.com) for beer info vi
 - [x] Admin page for search & save
 - [x] Custom post type for beers
 - [x] Localisation support
-- [ ] AJAX-based requests without page reload
+- [x] AJAX-based requests without page reload
 - [ ] Sort admin listing by rating, ABV, etc.
 - [ ] Beer filter by type, ABV, brewery etc.
 - [ ] Front-end UI, not only on admin side?
