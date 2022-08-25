@@ -315,7 +315,7 @@ function ubs_save_beers( $beer_ids ) {
 			} elseif ( 0 === $saved_beer ) {
 				$status = __( 'Saving failed.', 'ubs' );
 			} else {
-				$status = $saved_beer;
+				$status = get_post_meta( $saved_beer, 'rating_score', true );
 			}
 		}
 		$return_results[ $beer_id ] = $status;

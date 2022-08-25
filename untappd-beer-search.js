@@ -46,7 +46,7 @@ jQuery(document).ready(function ($) {
 			$.each(results, function (beer_id, status) {
 				if ($.isNumeric(status)) {
 					$('#beer-check-' + beer_id).prop("checked", true).attr("disabled", true);
-					$('#beer-save-' + beer_id).html('☑️');
+					$('#beer-save-' + beer_id).html('☑️ ' + ' Rating: ' + Number(status).toFixed(2) );
 				} else {
 					$('#beer-save-' + beer_id).html(status);
 				}
