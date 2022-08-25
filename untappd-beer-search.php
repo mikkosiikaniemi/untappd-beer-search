@@ -135,24 +135,6 @@ function ubs_search_beer_in_untappd( $beer_name ) {
  * @return void
  */
 function ubs_render_search_page() {
-
-	/*
-	$beer_name     = '';
-	$search_result = '';
-	if ( isset( $_GET['beer_name'] ) ) {
-		$beer_name     = sanitize_text_field( wp_unslash( $_GET['beer_name'] ) );
-		$search_result = ubs_search_beer_in_untappd( $beer_name );
-	}
-
-	if ( is_wp_error( $search_result ) ) {
-		$search_result = $search_result->get_error_message();
-	} elseif ( isset( $search_result['found'] ) && $search_result['found'] === 0 ) {
-		$search_result = __( 'No beers found.', 'ubs' );
-	} elseif ( false === empty( $search_result ) ) {
-		$search_result = ubs_render_search_results( $search_result );
-	}
-	*/
-
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Search Untappd', 'ubs' ); ?></h1>
@@ -220,18 +202,21 @@ function ubs_render_search_results( $result_array ) {
 
 	$html .= '<tbody>';
 	foreach ( $result_array['beers']['items'] as $beer ) {
-		$html .= '<tr>';
+		// Get the Untappd beer ID.
+		$beer_id = absint( $beer['beer']['bid'] );
 
+		// Start forming the HTML output.
+		$html .= '<tr>';
 		$html .= '<td>';
-		$html .= '<input type="checkbox" name="beer-id[]" value="' . $beer['beer']['bid'] . '" id="beer-check-' . $beer['beer']['bid'] . '"';
-		if ( false === get_post_status( $beer['beer']['bid'] ) ) {
+		$html .= '<input type="checkbox" name="beer-id[]" value="' . $beer_id . '" id="beer-check-' . $beer_id . '"';
+		if ( false === get_post_status( $beer_id ) ) {
 			$html .= ' checked="checked"';
 		}
 		$html .= '>';
 		$html .= '</td>';
 
 		$html .= '<td>';
-		$html .= $beer['beer']['bid'];
+		$html .= $beer_id;
 		$html .= '</td>';
 		$html .= '<td>';
 		$html .= $beer['brewery']['brewery_name'];
@@ -246,8 +231,8 @@ function ubs_render_search_results( $result_array ) {
 		$html .= number_format( $beer['beer']['beer_abv'], 1 );
 		$html .= '</td>';
 
-		$html .= '<td id="beer-save-' . $beer['beer']['bid'] . '">';
-		if ( false !== get_post_status( $beer['beer']['bid'] ) ) {
+		$html .= '<td id="beer-save-' . $beer_id . '">';
+		if ( false !== ubs_maybe_get_beer_cpt_id( $beer_id ) ) {
 			$html .= __( '☑️', 'ubs' );
 		} else {
 			$html .= __( '—', 'ubs' );
@@ -268,6 +253,33 @@ function ubs_render_search_results( $result_array ) {
 	$html .= '<p>Hourly API requests limit remaining: ' . $result_array['limit_remaining'] . '</p>';
 
 	return $html;
+}
+
+/**
+ * Determine if a beer has already been saved as CPT. Perform a meta query.
+ *
+ * @param  int $beer_id Beer ID.
+ * @return bool|int Is beer saved already? Return post ID if yes, otherwise false.
+ */
+function ubs_maybe_get_beer_cpt_id( $beer_id ) {
+	$beer_query = new WP_Query(
+		array(
+			'posts_per_page'         => 1,
+			'post_type'              => 'beer',
+			'meta_key'               => 'bid',
+			'meta_value'             => $beer_id,
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+		)
+	);
+
+	// If we found a post with the corresponding beer ID meta, return post ID.
+	if ( 1 === count( $beer_query->posts ) ) {
+		return $beer_query->posts[0]->ID;
+	}
+
+	// If no posts found, return false.
+	return false;
 }
 
 /**
@@ -309,8 +321,8 @@ function ubs_save_beers( $beer_ids ) {
 /**
  * Create (or update) a beer as custom post.
  *
- * @param  array        $beer_data Raw beer data from Untappd.
- * @return int|WP_Error            Insert post status.
+ * @param  array $beer_data Raw beer data from Untappd.
+ * @return int|WP_Error Insert post status.
  */
 function ubs_save_beer( $beer_data ) {
 
@@ -333,8 +345,9 @@ function ubs_save_beer( $beer_data ) {
 	$post_data['meta_input'] = $post_meta;
 
 	// If the beer has been saved before, set the ID so that the post can be updated.
-	if ( false !== get_post_status( $beer_data['bid'] ) ) {
-		$post_data['ID'] = $beer_data['bid'];
+	$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_data['bid'] );
+	if ( false !== $beer_post_id ) {
+		$post_data['ID'] = $beer_post_id;
 	}
 
 	return wp_insert_post( $post_data );
@@ -371,18 +384,6 @@ function ubs_get_beer_info( $beer_id ) {
 
 	return $return_array;
 }
-
-/**
- * Return the search form data, injected as URL parameters.
- *
- * @return void
- */
-/*
-function ubs_search_untappd() {
-	wp_safe_redirect( esc_url_raw( $_POST['_wp_http_referer'] . '&beer_name=' . urlencode( $_POST['beer_name'] ) ) );
-}
-add_action( 'admin_post_ubs_search', 'ubs_search_untappd' );
-*/
 
 /**
  * Initialize settings.
@@ -531,7 +532,7 @@ add_filter( 'manage_edit-beer_sortable_columns', 'ubs_register_sortable_columns'
 /**
  * Make custom columns (populated from meta data) sortable.
  *
- * @param  [type] $query
+ * @param  object $query WP Query object.
  * @return void
  */
 function ubs_sort_by_custom_column( $query ) {
@@ -607,6 +608,7 @@ function ubs_process_ajax_save_results() {
 	// Explode beer IDs from form data.
 	$beer_ids = array();
 	if ( isset( $_POST['beer_ids'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized --
 		parse_str( wp_unslash( $_POST['beer_ids'] ), $beer_ids );
 	}
 
