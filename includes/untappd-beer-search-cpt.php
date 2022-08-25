@@ -56,6 +56,7 @@ add_action( 'init', 'ubs_register_post_type' );
  */
 function ubs_set_custom_beer_columns( $columns ) {
 	unset( $columns['date'] );
+	$columns['link']   = __( 'Untappd Link', 'ubs' );
 	$columns['style']  = __( 'Style', 'ubs' );
 	$columns['abv']    = __( 'ABV%', 'ubs' );
 	$columns['rating'] = __( 'Rating', 'ubs' );
@@ -81,6 +82,11 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 			break;
 		case 'style':
 			echo esc_attr( get_post_meta( $post_id, 'beer_style', true ) );
+			break;
+		case 'link':
+			$beer_slug = get_post_meta( $post_id, 'beer_slug', true );
+			$beer_id   = get_post_meta( $post_id, 'bid', true );
+			echo '<a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . absint( $beer_id ) . ' <span class="dashicons dashicons-external"></span></a>';
 			break;
 	}
 }

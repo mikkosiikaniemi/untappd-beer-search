@@ -128,7 +128,8 @@ function ubs_render_search_results( $result_array ) {
 		$html .= $beer['brewery']['brewery_name'];
 		$html .= '</td>';
 		$html .= '<td>';
-		$html .= $beer['beer']['beer_name'];
+		$beer_url = esc_url( 'https://untappd.com/b/' . $beer['beer']['beer_slug'] . '/' . $beer_id );
+		$html .= '<a target="_blank" href="' . $beer_url . '">' . $beer['beer']['beer_name'] . ' <span class="dashicons dashicons-external"></span></a>';
 		$html .= '</td>';
 		$html .= '<td>';
 		$html .= $beer['beer']['beer_style'];
