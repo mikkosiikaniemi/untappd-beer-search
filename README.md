@@ -15,3 +15,4 @@ A WordPress plugin for searching [Untappd](https://untappd.com) for beer info vi
 - [ ] Taxonomies for beer type, ABV, country, brewery etc.
 - [ ] Search for multiple beers at once (textarea input instead of text)
 - [ ] Import data from [Alko](https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto) (as CSV) and match the corresponding Untappd beer ID
+- [ ] Replace jQuery with native JavaScript
