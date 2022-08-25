@@ -230,8 +230,8 @@ function ubs_render_search_results( $result_array ) {
 		$html .= '<td>';
 		$html .= number_format( $beer['beer']['beer_abv'], 1 );
 		$html .= '</td>';
-
 		$html .= '<td id="beer-save-' . $beer_id . '">';
+
 		$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_id );
 		if ( false !== $beer_post_id ) {
 			$html .= __( '☑️', 'ubs' );
@@ -267,6 +267,11 @@ function ubs_render_search_results( $result_array ) {
  * @return bool|int Is beer saved already? Return post ID if yes, otherwise false.
  */
 function ubs_maybe_get_beer_cpt_id( $beer_id ) {
+
+	// Formulate the query to search for a beer by Untappd ID.
+	// Yes, there is a meta query which may be slow but necessary, thus silencing code sniffer warning.
+	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 	$beer_query = new WP_Query(
 		array(
 			'posts_per_page'         => 1,
