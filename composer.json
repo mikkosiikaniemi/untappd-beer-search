@@ -1,0 +1,13 @@
+{
+    "name": "mikko.siikaniemi/untappd-beer-search",
+    "description": "Untappd Beer Search for WordPress",
+    "require": {
+        "shuchkin/simplexlsx": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "Mikko Siikaniemi",
+            "email": "mikko.siikaniemi@iki.fi"
+        }
+    ]
+}
