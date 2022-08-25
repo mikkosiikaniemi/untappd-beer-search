@@ -1,0 +1,202 @@
+# Copyright (C) 2022 Mikko Siikaniemi
+# This file is distributed under the same license as the Untappd Beer Search plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Untappd Beer Search 1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/untappd-beer-search\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2022-08-25T07:52:30+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.5.0\n"
+"X-Domain: ubs\n"
+
+#. Plugin Name of the plugin
+msgid "Untappd Beer Search"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://github.com/mikkosiikaniemi/untappd-beer-search"
+msgstr ""
+
+#. Description of the plugin
+msgid "Search beers in Untappd, save info/ratings into custom post type. Requires Untappd API access."
+msgstr ""
+
+#. Author of the plugin
+msgid "Mikko Siikaniemi"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://mikrogramma.fi"
+msgstr ""
+
+#: untappd-beer-search.php:33
+msgctxt "Post type general name"
+msgid "Beers"
+msgstr ""
+
+#: untappd-beer-search.php:34
+msgctxt "Post type singular name"
+msgid "Beer"
+msgstr ""
+
+#: untappd-beer-search.php:35
+msgctxt "Admin Menu text"
+msgid "Untappd Beers"
+msgstr ""
+
+#: untappd-beer-search.php:36
+msgctxt "Add New on Toolbar"
+msgid "Beer"
+msgstr ""
+
+#: untappd-beer-search.php:37
+msgid "Edit Beer"
+msgstr ""
+
+#: untappd-beer-search.php:38
+msgid "View Beer"
+msgstr ""
+
+#: untappd-beer-search.php:39
+msgid "All Beers"
+msgstr ""
+
+#: untappd-beer-search.php:40
+msgid "Search Beers"
+msgstr ""
+
+#: untappd-beer-search.php:41
+msgid "No beers found. Use \"Search Untappd\" to add new."
+msgstr ""
+
+#: untappd-beer-search.php:42
+msgid "No beers found in Trash."
+msgstr ""
+
+#: untappd-beer-search.php:80
+#: untappd-beer-search.php:148
+msgid "Search Untappd"
+msgstr ""
+
+#: untappd-beer-search.php:83
+msgid "Untappd Beer Search Settings"
+msgstr ""
+
+#: untappd-beer-search.php:83
+msgid "Settings"
+msgstr ""
+
+#: untappd-beer-search.php:123
+#: untappd-beer-search.php:389
+msgid "Untappd API request failed."
+msgstr ""
+
+#: untappd-beer-search.php:151
+#: untappd-beer-search.php:198
+msgid "Beer Name"
+msgstr ""
+
+#: untappd-beer-search.php:152
+msgid "Beer name..."
+msgstr ""
+
+#: untappd-beer-search.php:154
+msgid "Search"
+msgstr ""
+
+#. translators: amount of search results.
+#: untappd-beer-search.php:174
+msgid "No beers found."
+msgstr ""
+
+#. translators: amount of search results.
+#: untappd-beer-search.php:181
+msgid "Found %d results."
+msgstr ""
+
+#: untappd-beer-search.php:189
+msgid "Save"
+msgstr ""
+
+#: untappd-beer-search.php:192
+msgid "Beer ID"
+msgstr ""
+
+#: untappd-beer-search.php:195
+msgid "Brewery"
+msgstr ""
+
+#: untappd-beer-search.php:201
+msgid "Beer Style"
+msgstr ""
+
+#: untappd-beer-search.php:204
+#: untappd-beer-search.php:509
+msgid "ABV%"
+msgstr ""
+
+#: untappd-beer-search.php:207
+msgid "Already saved?"
+msgstr ""
+
+#: untappd-beer-search.php:245
+msgid "☑️"
+msgstr ""
+
+#: untappd-beer-search.php:247
+msgid "Rating:"
+msgstr ""
+
+#: untappd-beer-search.php:251
+msgid "—"
+msgstr ""
+
+#: untappd-beer-search.php:260
+msgid "Save selected"
+msgstr ""
+
+#: untappd-beer-search.php:323
+msgid "No beer found with this ID."
+msgstr ""
+
+#: untappd-beer-search.php:329
+msgid "Saving failed."
+msgstr ""
+
+#: untappd-beer-search.php:424
+msgid "Untappd Client ID"
+msgstr ""
+
+#: untappd-beer-search.php:432
+msgid "Untappd Client Secret"
+msgstr ""
+
+#: untappd-beer-search.php:472
+msgid "Untappd API access is required. Please enter your ID and secret from <a href=\"https://untappd.com/api/dashboard\">Untappd API dashboard</a> page."
+msgstr ""
+
+#: untappd-beer-search.php:487
+msgid "Untappd API Settings"
+msgstr ""
+
+#: untappd-beer-search.php:508
+msgid "Style"
+msgstr ""
+
+#: untappd-beer-search.php:510
+msgid "Rating"
+msgstr ""
+
+#: untappd-beer-search.php:596
+#: untappd-beer-search.php:623
+msgid "Permission check failed. Please reload the page and try again."
+msgstr ""
+
+#: untappd-beer-search.php:600
+msgid "Please enter a search term."
+msgstr ""
