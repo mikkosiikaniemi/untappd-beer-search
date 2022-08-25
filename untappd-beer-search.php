@@ -232,8 +232,13 @@ function ubs_render_search_results( $result_array ) {
 		$html .= '</td>';
 
 		$html .= '<td id="beer-save-' . $beer_id . '">';
-		if ( false !== ubs_maybe_get_beer_cpt_id( $beer_id ) ) {
+		$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_id );
+		if ( false !== $beer_post_id ) {
 			$html .= __( '☑️', 'ubs' );
+			$html .= ' ';
+			$html .= __( 'Rating:', 'ubs' );
+			$html .= ' ';
+			$html .= number_format( get_post_meta( $beer_post_id, 'rating_score', true ), 2 );
 		} else {
 			$html .= __( '—', 'ubs' );
 		}
