@@ -65,7 +65,6 @@ function ubs_initialize_settings() {
 		'ubs_settings',
 		'ubs_settings_section_alko'
 	);
-
 }
 add_action( 'admin_init', 'ubs_initialize_settings' );
 
@@ -77,7 +76,7 @@ add_action( 'admin_init', 'ubs_initialize_settings' );
 function ubs_setting_client_id() {
 	$options = get_option( 'ubs_settings' );
 	?>
-	<input type="text" size="46" name="ubs_settings[ubs_setting_client_id]" value="<?php echo esc_attr( $options['ubs_setting_client_id'] ); ?>" />
+	<input type="text" size="46" name="ubs_settings[ubs_setting_client_id]" value="<?php echo isset( $options['ubs_setting_client_id'] ) ? esc_attr( $options['ubs_setting_client_id'] ) : ''; ?>" />
 	<?php
 }
 
@@ -89,7 +88,49 @@ function ubs_setting_client_id() {
 function ubs_setting_client_secret() {
 	$options = get_option( 'ubs_settings' );
 	?>
-	<input type="password" size="46" name="ubs_settings[ubs_setting_client_secret]" value="<?php echo esc_attr( $options['ubs_setting_client_secret'] ); ?>" />
+	<input type="password" size="46" name="ubs_settings[ubs_setting_client_secret]" value="<?php echo isset( $options['ubs_setting_client_secret'] ) ? esc_attr( $options['ubs_setting_client_secret'] ) : ''; ?>" />
+	<?php
+}
+
+/**
+ * Render Client Secret setting.
+ *
+ * @return void
+ */
+function ubs_setting_alko_price_sheet() {
+	$options = get_option( 'ubs_settings' );
+
+	$xlsx_attachments = new WP_Query(
+		array(
+			'post_type'              => 'attachment',
+			'post_status'            => 'inherit',
+			'post_mime_type'         => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		)
+	);
+
+	?>
+
+<select name="ubs_settings[ubs_setting_alko_price_sheet]">
+	<?php if ( $xlsx_attachments->have_posts() ) : ?>
+		<option value=""><?php esc_html_e( 'Please select a sheet...', 'ubs' ); ?></option>
+		<?php
+		foreach ( $xlsx_attachments->posts as $attachment ) {
+			echo '<option value="' . absint( $attachment->ID ) . '"';
+			if ( absint( $options['ubs_setting_alko_price_sheet'] ) === $attachment->ID ) {
+				echo ' selected';
+			}
+			echo '>';
+			echo esc_attr( basename( $attachment->guid ) );
+			echo '</option>';
+		};
+		?>
+		<?php else : ?>
+			<option value=""><?php esc_html_e( 'Upload price sheet to Media Library first.', 'ubs' ); ?></option>
+			<?php endif; ?>
+	</select>
 	<?php
 }
 
@@ -114,20 +155,8 @@ function ubs_settings_section_untappd_callback() {
 function ubs_settings_section_alko_callback() {
 	?>
 	<p>
-	<?php echo wp_kses_post( __( 'Upload Alko price sheet (XLSX) for autocomplete for beer search against the Alko catalog. <a href="https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto">Download Alko price sheet</a>.', 'ubs' ) ); ?>
+	<?php echo wp_kses_post( __( 'Alko price sheet (XLSX) can be used to autocomplete beer search against the Alko catalog. <a href="https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto">Download Alko price sheet</a> and upload it to Media Library for use here.', 'ubs' ) ); ?>
 	</p>
-	<?php
-}
-
-/**
- * Render Client Secret setting.
- *
- * @return void
- */
-function ubs_setting_alko_price_sheet() {
-	$options = get_option( 'ubs_settings' );
-	?>
-	<input type="file" name="demo-file" />
 	<?php
 }
 
@@ -137,11 +166,21 @@ function ubs_setting_alko_price_sheet() {
  * @return void
  */
 function ubs_render_options_page() {
+
+	// Check if the user have submitted the settings.
+	// WordPress will add the "settings-updated" $_GET parameter to the url.
+	if ( isset( $_GET['settings-updated'] ) ) {
+		// Add settings saved message with the class of "updated".
+		add_settings_error( 'ubs_messages', 'ubs_message', __( 'Settings Saved', 'ubs' ), 'updated' );
+	}
+
+	// Show error/update messages.
+	settings_errors( 'ubs_messages' );
 	?>
 	<div class="wrap">
-		<form action='options.php' method='post'>
+		<form action='options.php' method='post' enctype='multipart/form-data'>
 
-			<h1><?php esc_html_e( 'Untappd Beer Search Settings', 'ubs' ); ?></h1>
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
 			<?php
 			settings_fields( 'ubs_settings' );

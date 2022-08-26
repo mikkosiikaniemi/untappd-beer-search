@@ -8,40 +8,85 @@
  * XLSX processing is done with help of Shuchkin\SimpleXLSX.
  * https://github.com/shuchkin/simplexlsx
  *
- *
  * @package           UBS
  * @author            Mikko Siikaniemi
  */
 
-require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+// Load composerized dependencies.
+
+require plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
 use Shuchkin\SimpleXLSX;
 
-$alko_price_sheet_file = plugin_dir_path( __FILE__ ) . 'alko.xlsx';
+/**
+ * Process Alko price sheet when settings updated.
+ *
+ * @param  [type] $old_value
+ * @param  [type] $value
+ * @param  [type] $option
+ * @return void
+ */
+function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
+	$price_sheet_attachment_id = $value['ubs_setting_alko_price_sheet'];
 
-$alko_prices_data = new SimpleXLSX( $alko_price_sheet_file );
-if ( $alko_prices_data->success() ) {
-	$row_counter               = 0;
-	$header_row_found          = false;
-	$price_list_category_index = false;
-	foreach ( $xlsx->rows() as $row_index => $row ) {
-
-		// We expect to find a row with first cell saying "Numero".
-		// This way we identify the row with header data.
-		if ( $row[0] !== 'Numero' && $header_row_found === false ) {
-			continue;
-		}
-
-		if ( $header_row_found === false ) {
-			$price_list_category_index = array_search( 'Hinnastojärjestyskoodi', $row, true );
-			$header_row_found = true;
-		}
-
-
-		if ( $row_counter < 5 ) {
-			print_r( $row[ $price_list_category_index ] );
-		}
-		$row_counter++;
+	if ( empty( $price_sheet_attachment_id ) ) {
+		return;
 	}
-} else {
-	echo 'xlsx error: ' . $alko_prices_data->error();
+
+	$alko_price_sheet_file = get_attached_file( $price_sheet_attachment_id );
+
+	$alko_prices_data = new SimpleXLSX( $alko_price_sheet_file );
+
+	if ( $alko_prices_data->success() ) {
+		$row_counter               = 0;
+		$header_row_found          = false;
+		$price_list_category_index = false;
+		$beer_wort_abv_index       = false;
+		$beers                     = array();
+
+		$remove_these_suffixes = array(
+			'tölkki',
+			'viinipussi',
+			'hanapakkaus',
+			'muovipullo',
+			'tynnyri',
+		);
+
+		foreach ( $alko_prices_data->rows() as $row_index => $row ) {
+
+			// We expect to find a row with first cell saying "Numero".
+			// This way we identify the row with header data.
+			if ( 'Numero' !== $row[0] && false === $header_row_found ) {
+				continue;
+			}
+
+			if ( false === $header_row_found ) {
+				$price_list_category_index = array_search( 'Hinnastojärjestyskoodi', $row, true );
+				$beer_wort_abv_index       = array_search( 'Kantavierrep-%', $row, true );
+				$header_row_found          = true;
+				continue;
+			}
+
+			// Beers are categorized with code '600'.
+			if ( '600' === $row[ $price_list_category_index ] || false === empty( $row[ $beer_wort_abv_index ] ) ) {
+				$beer_name = esc_attr( $row[1] );
+				$brewery   = esc_attr( $row[2] );
+
+				foreach ( $remove_these_suffixes as $suffix ) {
+					if ( $suffix_position = strrpos( $beer_name, $suffix ) ) {
+						$beer_name = trim( substr( $beer_name, 0, -strlen( $suffix ) ) );
+					}
+				}
+
+				$beers[ $row[0] ] = $brewery . ' ' . $beer_name;
+			}
+
+			$row_counter++;
+		}
+		update_option( 'ubs_beers', $beers, false );
+
+	} else {
+		wp_die( $alko_prices_data->error() );
+	}
 }
+add_action( 'update_option_ubs_settings', 'ubs_process_alko_price_sheet', 10, 3 );
+

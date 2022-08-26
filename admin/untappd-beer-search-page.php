@@ -47,7 +47,17 @@ function ubs_render_search_page() {
 		<p><?php echo wp_kses_post( 'Search Untappd for a beer (by name). For best results, include brewery name in the beginning, e.g. <em>Mallaskoski Jeriko Cherry Sour Wild Ale</em>.', 'ubs' ); ?></p>
 		<form id="ubs-search" action="" method="post">
 			<label for="beer-name" class="screen-reader-text"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
-			<input type="text" name="beer_name" size="40" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required />
+			<input type="text" name="beer_name" size="50" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" />
+			<datalist id="beer-names">
+				<?php
+				$beers = get_option( 'ubs_beers' );
+				if ( false !== $beers && false === empty( $beers ) ) {
+					foreach ( $beers as $alko_id => $beer_name ) {
+						echo '<option>' . esc_attr( $beer_name ) . '</option>';
+					}
+				}
+				?>
+			</datalist>
 			<?php wp_nonce_field( 'ubs_search', 'ubs_search_nonce' ); ?>
 			<button id="ubs-search-submit" class="button button-primary" type="submit"><?php esc_attr_e( 'Search', 'ubs' ); ?></button>
 			<span class="spinner" style="float:none;"></span>
