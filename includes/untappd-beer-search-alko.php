@@ -49,6 +49,10 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 			'hanapakkaus',
 			'muovipullo',
 			'tynnyri',
+			'6-pack',
+			'8-pack',
+			'12-pack',
+			'24-pack',
 		);
 
 		foreach ( $alko_prices_data->rows() as $row_index => $row ) {
