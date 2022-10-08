@@ -16,3 +16,5 @@ A WordPress plugin for searching [Untappd](https://untappd.com) for beer info vi
 - [ ] Taxonomies for beer type, ABV, country, brewery etc.
 - [ ] Search for multiple beers at once (textarea input instead of text)
 - [ ] Replace jQuery with native JavaScript
+- [ ] Process the whole Alko catalog in batches, trying to match beers as automatically as possible, skipping already imported beers 
+- [ ] Ability to re-fetch beer info to update an existing beer 
