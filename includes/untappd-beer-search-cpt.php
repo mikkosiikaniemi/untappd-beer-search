@@ -48,7 +48,7 @@ function ubs_register_post_type() {
 
 		// Register brewery taxonomy.
 		$brewery_taxonomy_labels = array(
-			'name'                       => _x( 'Breweries', 'taxonomy general name', 'ubs' ),
+			'name'                       => _x( 'Brewery', 'taxonomy general name', 'ubs' ),
 			'singular_name'              => _x( 'Brewery', 'taxonomy singular name', 'ubs' ),
 			'menu_name'                  => __( 'Breweries', 'ubs' ),
 			'all_items'                  => __( 'All Breweries', 'ubs' ),
@@ -168,6 +168,9 @@ function ubs_save_beer( $beer_data ) {
 		'post_content' => wp_strip_all_tags( $beer_data['beer_description'] ),
 		'import_id'    => absint( $beer_data['bid'] ),
 		'post_status'  => 'publish',
+		'tax_input'    => array(
+			'brewery' => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] ),
+		),
 	);
 
 	// Make a copy of the beer data, to be saved as post meta.
