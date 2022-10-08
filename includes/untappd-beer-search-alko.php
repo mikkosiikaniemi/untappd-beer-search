@@ -20,9 +20,9 @@ use Shuchkin\SimpleXLSX;
 /**
  * Process Alko price sheet when settings updated.
  *
- * @param  [type] $old_value
- * @param  [type] $value
- * @param  [type] $option
+ * @param  mixed  $old_value Old option value.
+ * @param  mixed  $value     New option value.
+ * @param  string $option    Option name.
  * @return void
  */
 function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
@@ -72,7 +72,8 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 				$brewery   = esc_attr( $row[2] );
 
 				foreach ( $remove_these_suffixes as $suffix ) {
-					if ( $suffix_position = strrpos( $beer_name, $suffix ) ) {
+					$suffix_position = strrpos( $beer_name, $suffix );
+					if ( false !== $suffix_position ) {
 						$beer_name = trim( substr( $beer_name, 0, -strlen( $suffix ) ) );
 					}
 				}
@@ -85,7 +86,7 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 		update_option( 'ubs_beers', $beers, false );
 
 	} else {
-		wp_die( $alko_prices_data->error() );
+		wp_die( esc_html( $alko_prices_data->error() ) );
 	}
 }
 add_action( 'update_option_ubs_settings', 'ubs_process_alko_price_sheet', 10, 3 );
