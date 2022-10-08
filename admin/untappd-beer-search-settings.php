@@ -124,6 +124,7 @@ function ubs_setting_alko_price_sheet() {
 			}
 			echo '>';
 			echo esc_attr( basename( $attachment->guid ) );
+			echo ' (' . esc_attr( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $attachment->post_date_gmt ) ) ) . ')';
 			echo '</option>';
 		};
 		?>
