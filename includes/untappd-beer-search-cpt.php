@@ -46,34 +46,93 @@ function ubs_register_post_type() {
 
 	register_post_type( 'beer', $args );
 
-		// Register brewery taxonomy.
-		$brewery_taxonomy_labels = array(
-			'name'                       => _x( 'Brewery', 'taxonomy general name', 'ubs' ),
-			'singular_name'              => _x( 'Brewery', 'taxonomy singular name', 'ubs' ),
-			'menu_name'                  => __( 'Breweries', 'ubs' ),
-			'all_items'                  => __( 'All Breweries', 'ubs' ),
-			'edit_item'                  => __( 'Edit Brewery', 'ubs' ),
-			'update_item'                => __( 'Update Brewery', 'ubs' ),
-			'search_items'               => __( 'Search Breweries', 'ubs' ),
-			'popular_items'              => __( 'Popular Breweries', 'ubs' ),
-			'add_new_item'               => __( 'Add New Brewery', 'ubs' ),
-			'new_item_name'              => __( 'New Brewery Name', 'ubs' ),
-			'separate_items_with_commas' => __( 'Separate breweries with commas', 'ubs' ),
-			'add_or_remove_items'        => __( 'Add or remove breweries', 'ubs' ),
-			'choose_from_most_used'      => __( 'Choose from the most used breweries', 'ubs' ),
-			'not_found'                  => __( 'No breweries found.', 'ubs' ),
-			'back_to_items'              => __( '← Back to Breweries', 'ubs' ),
-		);
+	// Register brewery taxonomy.
+	$brewery_taxonomy_labels = array(
+		'name'                       => _x( 'Brewery', 'taxonomy general name', 'ubs' ),
+		'singular_name'              => _x( 'Brewery', 'taxonomy singular name', 'ubs' ),
+		'menu_name'                  => __( 'Breweries', 'ubs' ),
+		'all_items'                  => __( 'All Breweries', 'ubs' ),
+		'edit_item'                  => __( 'Edit Brewery', 'ubs' ),
+		'update_item'                => __( 'Update Brewery', 'ubs' ),
+		'search_items'               => __( 'Search Breweries', 'ubs' ),
+		'popular_items'              => __( 'Popular Breweries', 'ubs' ),
+		'add_new_item'               => __( 'Add New Brewery', 'ubs' ),
+		'new_item_name'              => __( 'New Brewery Name', 'ubs' ),
+		'separate_items_with_commas' => __( 'Separate breweries with commas', 'ubs' ),
+		'add_or_remove_items'        => __( 'Add or remove breweries', 'ubs' ),
+		'choose_from_most_used'      => __( 'Choose from the most used breweries', 'ubs' ),
+		'not_found'                  => __( 'No breweries found.', 'ubs' ),
+		'back_to_items'              => __( '← Back to Breweries', 'ubs' ),
+	);
 
-		$brewery_taxonomy_args = array(
-			'labels'                => $brewery_taxonomy_labels,
-			'show_admin_column'     => true,
-			'update_count_callback' => '_update_post_term_count',
-			'query_var'             => true,
-			'rewrite'               => array( 'slug' => 'brewery' ),
-		);
+	$brewery_taxonomy_args = array(
+		'labels'                => $brewery_taxonomy_labels,
+		'show_admin_column'     => true,
+		'update_count_callback' => '_update_post_term_count',
+		'query_var'             => true,
+		'rewrite'               => array( 'slug' => 'brewery' ),
+	);
 
-		register_taxonomy( 'brewery', 'beer', $brewery_taxonomy_args );
+	register_taxonomy( 'brewery', 'beer', $brewery_taxonomy_args );
+
+	// Register beer style taxonomy.
+	$style_taxonomy_labels = array(
+		'name'                       => _x( 'Style', 'taxonomy general name', 'ubs' ),
+		'singular_name'              => _x( 'Style', 'taxonomy singular name', 'ubs' ),
+		'menu_name'                  => __( 'Styles', 'ubs' ),
+		'all_items'                  => __( 'All Styles', 'ubs' ),
+		'edit_item'                  => __( 'Edit Style', 'ubs' ),
+		'update_item'                => __( 'Update Style', 'ubs' ),
+		'search_items'               => __( 'Search Styles', 'ubs' ),
+		'popular_items'              => __( 'Popular Styles', 'ubs' ),
+		'add_new_item'               => __( 'Add New Style', 'ubs' ),
+		'new_item_name'              => __( 'New Style Name', 'ubs' ),
+		'separate_items_with_commas' => __( 'Separate Styles with commas', 'ubs' ),
+		'add_or_remove_items'        => __( 'Add or remove Styles', 'ubs' ),
+		'choose_from_most_used'      => __( 'Choose from the most used Styles', 'ubs' ),
+		'not_found'                  => __( 'No Styles found.', 'ubs' ),
+		'back_to_items'              => __( '← Back to Styles', 'ubs' ),
+	);
+
+	$style_taxonomy_args = array(
+		'labels'                => $style_taxonomy_labels,
+		'show_admin_column'     => true,
+		'update_count_callback' => '_update_post_term_count',
+		'query_var'             => true,
+		'rewrite'               => array( 'slug' => 'style' ),
+		'hierarchical'          => true,
+	);
+
+	register_taxonomy( 'style', 'beer', $style_taxonomy_args );
+
+	// Register brewery country taxonomy.
+	$country_taxonomy_labels = array(
+		'name'                       => _x( 'Country', 'taxonomy general name', 'ubs' ),
+		'singular_name'              => _x( 'Country', 'taxonomy singular name', 'ubs' ),
+		'menu_name'                  => __( 'Countries', 'ubs' ),
+		'all_items'                  => __( 'All Countries', 'ubs' ),
+		'edit_item'                  => __( 'Edit Country', 'ubs' ),
+		'update_item'                => __( 'Update Country', 'ubs' ),
+		'search_items'               => __( 'Search Countries', 'ubs' ),
+		'popular_items'              => __( 'Popular Countries', 'ubs' ),
+		'add_new_item'               => __( 'Add New Country', 'ubs' ),
+		'new_item_name'              => __( 'New Country Name', 'ubs' ),
+		'separate_items_with_commas' => __( 'Separate Countries with commas', 'ubs' ),
+		'add_or_remove_items'        => __( 'Add or remove Countries', 'ubs' ),
+		'choose_from_most_used'      => __( 'Choose from the most used Countries', 'ubs' ),
+		'not_found'                  => __( 'No Countries found.', 'ubs' ),
+		'back_to_items'              => __( '← Back to Countries', 'ubs' ),
+	);
+
+	$country_taxonomy_args = array(
+		'labels'                => $country_taxonomy_labels,
+		'show_admin_column'     => true,
+		'update_count_callback' => '_update_post_term_count',
+		'query_var'             => true,
+		'rewrite'               => array( 'slug' => 'country' ),
+	);
+
+	register_taxonomy( 'country', 'beer', $country_taxonomy_args );
 }
 add_action( 'init', 'ubs_register_post_type' );
 
@@ -86,7 +145,6 @@ add_action( 'init', 'ubs_register_post_type' );
 function ubs_set_custom_beer_columns( $columns ) {
 	unset( $columns['date'] );
 	$columns['link']   = __( 'Untappd Link', 'ubs' );
-	$columns['style']  = __( 'Style', 'ubs' );
 	$columns['abv']    = __( 'ABV%', 'ubs' );
 	$columns['rating'] = __( 'Rating', 'ubs' );
 
@@ -108,9 +166,6 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 			break;
 		case 'abv':
 			echo number_format( get_post_meta( $post_id, 'beer_abv', true ), 1 );
-			break;
-		case 'style':
-			echo esc_attr( get_post_meta( $post_id, 'beer_style', true ) );
 			break;
 		case 'link':
 			$beer_slug = get_post_meta( $post_id, 'beer_slug', true );
@@ -162,15 +217,93 @@ add_action( 'pre_get_posts', 'ubs_sort_by_custom_column' );
  */
 function ubs_save_beer( $beer_data ) {
 
+	// Determine basic taxonomy data.
+	$tax_input = array(
+		'brewery' => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] ),
+		'country' => wp_strip_all_tags( $beer_data['brewery']['country_name'] ),
+	);
+
+	/**
+	 * Determine beer style taxonomy data. This requires some work to build hierarchy.
+	 *
+	 * Untappd has at least three different templates for style;
+	 * 1. One main style (alone)
+	 * 2. Several main styles (separated by slash)
+	 * 3. Main style & substyles (main style followed by dash,
+	 *    substyles separated by slash)
+	 *
+	 * We process these in the following if-structure in reverse order.
+	 */
+
+	$style_term_ids = array();
+
+	if ( false !== strpos( wp_strip_all_tags( $beer_data['beer_style'] ), ' - ' ) ) {
+
+		list( $main_style, $sub_style_string ) = explode( ' - ', wp_strip_all_tags( $beer_data['beer_style'] ) );
+
+		if ( false !== strpos( $sub_style_string, ' / ' ) ) {
+			$sub_styles = explode( ' / ', $sub_style_string );
+		} else {
+			$sub_styles = array( $sub_style_string );
+		}
+
+		// Check if the main style term exists.
+		$main_style_term = term_exists( $main_style, 'style', 0 );
+
+		// Create main style term if it doesn't exist.
+		if ( null === $main_style_term ) {
+			$main_style_term = wp_insert_term( $main_style, 'style', array( 'parent' => 0 ) );
+		}
+
+		$style_term_ids[] = $main_style_term['term_taxonomy_id'];
+
+		// Check if any of the substyles exist.
+		foreach ( $sub_styles as $sub_style ) {
+			$sub_style_term = term_exists( $sub_style, 'style', $main_style_term['term_taxonomy_id'] );
+
+			// Create sub style term if it doesn't exist.
+			if ( null === $sub_style_term ) {
+				$sub_style_term = wp_insert_term( $sub_style, 'style', array( 'parent' => $main_style_term['term_taxonomy_id'] ) );
+			}
+
+			$style_term_ids[] = $sub_style_term['term_taxonomy_id'];
+		}
+
+		$tax_input['style'] = $style_term_ids;
+
+	} elseif ( false !== strpos( wp_strip_all_tags( $beer_data['beer_style'] ), ' / ' ) ) {
+		$main_styles = explode( ' / ', wp_strip_all_tags( $beer_data['beer_style'] ) );
+
+		foreach ( $main_styles as $main_style ) {
+			$main_style_term = term_exists( $main_style, 'style', 0 );
+
+			// Create main style term if it doesn't exist.
+			if ( null === $main_style_term ) {
+				$main_style_term = wp_insert_term( $main_style, 'style', array( 'parent' => 0 ) );
+			}
+
+			$style_term_ids[] = $main_style_term['term_taxonomy_id'];
+		}
+
+		$tax_input['style'] = $style_term_ids;
+	} else {
+		$main_style_term = term_exists( wp_strip_all_tags( $beer_data['beer_style'] ), 'style', 0 );
+
+		// Create main style term if it doesn't exist.
+		if ( null === $main_style_term ) {
+			$main_style_term = wp_insert_term( wp_strip_all_tags( $beer_data['beer_style'] ), 'style', array( 'parent' => 0 ) );
+		}
+
+		$tax_input['style'] = array( $main_style_term['term_taxonomy_id'] );
+	}
+
 	$post_data = array(
 		'post_type'    => 'beer',
-		'post_title'   => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] . ' ' . $beer_data['beer_name'] ),
+		'post_title'   => wp_strip_all_tags( $beer_data['beer_name'] ),
 		'post_content' => wp_strip_all_tags( $beer_data['beer_description'] ),
 		'import_id'    => absint( $beer_data['bid'] ),
 		'post_status'  => 'publish',
-		'tax_input'    => array(
-			'brewery' => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] ),
-		),
+		'tax_input'    => $tax_input,
 	);
 
 	// Make a copy of the beer data, to be saved as post meta.
