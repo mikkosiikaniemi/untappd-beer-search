@@ -183,11 +183,142 @@ function ubs_save_beer( $beer_data ) {
 	unset( $post_meta['friends'] );
 	$post_data['meta_input'] = $post_meta;
 
-	// If the beer has been saved before, set the ID so that the post can be updated.
+	// Determine if the beer has been saved before.
 	$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_data['bid'] );
 	if ( false !== $beer_post_id ) {
+		// Set the ID so that the existing post can be updated.
 		$post_data['ID'] = $beer_post_id;
+		return wp_update_post( $post_data );
+	} else {
+		// Insert a new beer post.
+		return wp_insert_post( $post_data );
+	}
+}
+
+/**
+ * Add "re-fetch from Untappd" to beer CPT row actions.
+ *
+ * @param  array  $actions Original post row actions.
+ * @param  object $post    Post object.
+ * @return array  $actions New actions.
+ */
+function ubs_add_refetch_action( $actions, $post ) {
+
+	// Check that we're on beer post type.
+	if ( 'beer' === $post->post_type ) {
+
+		// Build link URL.
+		$url = admin_url( 'post.php?post_type=beer&post=' . $post->ID );
+
+		// Add new action argument.
+		$edit_link = add_query_arg( array( 'action' => 'refetch' ), $url );
+		$edit_link = add_query_arg( '_wpnonce', wp_create_nonce( 'refetched' ), $edit_link );
+
+		// Define new action link.
+		$actions['refetch'] = '<a href="' . esc_url( $edit_link ) . '">' . __( 'Re-fetch from Untappd', 'ubs' ) . '</a>';
+	}
+	return $actions;
+}
+add_filter( 'post_row_actions', 'ubs_add_refetch_action', 10, 2 );
+
+/**
+ * Re-fetch beer info from Untappd.
+ *
+ * @param  int $post_id Post ID.
+ * @return void
+ */
+function ubs_refetch_beer_info( $post_id ) {
+
+	// Get beer ID from post meta.
+	$beer_id = get_post_meta( $post_id, 'bid', true );
+
+	// Get beer info from Untappd.
+	$beer_info = ubs_get_beer_info( $beer_id );
+
+	// Save beer info.
+	ubs_save_beer( $beer_info['beer'] );
+}
+
+/**
+ * Handle "refetch" post row action.
+ *
+ * @param  int $post_id Post ID.
+ * @return void
+ */
+function ubs_handle_refetch_action( $post_id ) {
+
+	ubs_refetch_beer_info( $post_id );
+
+	// Remove "refetch" query string argument.
+	$redirect_url = remove_query_arg( array( 'refetch' ), wp_get_referer() );
+
+	// Add "refetched" query string argument to enable admin notice display.
+	$redirect_url = add_query_arg( array( 'refetched' => 'true' ), $redirect_url );
+
+	// Make redirect.
+	wp_safe_redirect( $redirect_url );
+	exit;
+}
+add_action( 'post_action_refetch', 'ubs_handle_refetch_action' );
+
+/**
+ * Add "refetch" to beer CPT bulk actions.
+ *
+ * @param  array $bulk_array Array of bulk actions.
+ * @return array $bulk_array New array of bulk actions.
+ */
+function ubs_add_refetch_bulk_action( $bulk_array ) {
+	$bulk_array['refetch'] = __( 'Re-fetch from Untappd', 'ubs' );
+	return $bulk_array;
+}
+add_filter( 'bulk_actions-edit-beer', 'ubs_add_refetch_bulk_action' );
+
+/**
+ * Handle "refetch" as bulk action.
+ *
+ * @param  string $redirect   URL to be redirected to after action.
+ * @param  string $doaction   Action name.
+ * @param  array  $object_ids Array of object IDs to perform bulk action for.
+ * @return string $redirect   New URL to be redirected to.
+ */
+function ubs_handle_refetch_bulk_action( $redirect, $doaction, $object_ids ) {
+
+	// Let's remove the "refetch" query arg first.
+	$redirect = remove_query_arg( 'refetch', $redirect );
+
+	// If "refetch" bulk action initiated, refetch beer infos.
+	if ( 'refetch' === $doaction ) {
+		foreach ( $object_ids as $post_id ) {
+			ubs_refetch_beer_info( $post_id );
+		}
 	}
 
-	return wp_insert_post( $post_data );
+	// Add query arg in order to display admin notice.
+	$redirect = add_query_arg( array( 'refetched' => 'true' ), $redirect );
+
+	return $redirect;
 }
+add_filter( 'handle_bulk_actions-edit-beer', 'ubs_handle_refetch_bulk_action', 10, 3 );
+
+/**
+ * Display admin notice after beer info has been refetched from Untappd.
+ *
+ * @return void
+ */
+function ubs_display_refetched_admin_notice() {
+
+	// Check that we are on beer CPT list. If not, bail out.
+	$screen = get_current_screen();
+	if ( 'edit-beer' !== $screen->id ) {
+		return;
+	}
+
+	// Display admin notice after beer info re-fetched.
+	if ( isset( $_GET['refetched'] ) && 'true' === $_GET['refetched'] ) : ?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php esc_html_e( 'Beer info re-fetched.', 'ubs' ); ?></p>
+		</div>
+		<?php
+	endif;
+}
+add_action( 'admin_notices', 'ubs_display_refetched_admin_notice' );
