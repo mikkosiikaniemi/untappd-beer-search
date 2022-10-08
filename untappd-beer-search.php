@@ -5,6 +5,9 @@
  * @package           UBS
  * @author            Mikko Siikaniemi
  *
+ * To update the localisation POT file, run the following in the plugin dir:
+ * wp i18n make-pot . languages/untappd-beer-search.pot
+ *
  * @wordpress-plugin
  * Plugin Name:       Untappd Beer Search
  * Plugin URI:        https://github.com/mikkosiikaniemi/untappd-beer-search
@@ -27,3 +30,4 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-remote-
 require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-page.php';
 require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-settings.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-helpers.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-alko.php';
