@@ -45,6 +45,35 @@ function ubs_register_post_type() {
 	);
 
 	register_post_type( 'beer', $args );
+
+		// Register brewery taxonomy.
+		$brewery_taxonomy_labels = array(
+			'name'                       => _x( 'Breweries', 'taxonomy general name', 'ubs' ),
+			'singular_name'              => _x( 'Brewery', 'taxonomy singular name', 'ubs' ),
+			'menu_name'                  => __( 'Breweries', 'ubs' ),
+			'all_items'                  => __( 'All Breweries', 'ubs' ),
+			'edit_item'                  => __( 'Edit Brewery', 'ubs' ),
+			'update_item'                => __( 'Update Brewery', 'ubs' ),
+			'search_items'               => __( 'Search Breweries', 'ubs' ),
+			'popular_items'              => __( 'Popular Breweries', 'ubs' ),
+			'add_new_item'               => __( 'Add New Brewery', 'ubs' ),
+			'new_item_name'              => __( 'New Brewery Name', 'ubs' ),
+			'separate_items_with_commas' => __( 'Separate breweries with commas', 'ubs' ),
+			'add_or_remove_items'        => __( 'Add or remove breweries', 'ubs' ),
+			'choose_from_most_used'      => __( 'Choose from the most used breweries', 'ubs' ),
+			'not_found'                  => __( 'No breweries found.', 'ubs' ),
+			'back_to_items'              => __( '← Back to Breweries', 'ubs' ),
+		);
+
+		$brewery_taxonomy_args = array(
+			'labels'                => $brewery_taxonomy_labels,
+			'show_admin_column'     => true,
+			'update_count_callback' => '_update_post_term_count',
+			'query_var'             => true,
+			'rewrite'               => array( 'slug' => 'brewery' ),
+		);
+
+		register_taxonomy( 'brewery', 'beer', $brewery_taxonomy_args );
 }
 add_action( 'init', 'ubs_register_post_type' );
 
