@@ -53,7 +53,7 @@ function ubs_render_search_page() {
 				$beers = get_option( 'ubs_beers' );
 				if ( false !== $beers && false === empty( $beers ) ) {
 					foreach ( $beers as $alko_id => $beer_name ) {
-						echo '<option>' . esc_attr( $beer_name ) . '</option>';
+						echo '<option data-alko-id="' . absint( $alko_id ) . '">' . esc_attr( $beer_name ) . '</option>';
 					}
 				}
 				?>
