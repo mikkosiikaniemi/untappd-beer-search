@@ -42,6 +42,7 @@ function ubs_register_post_type() {
 		'menu_position'      => null,
 		'menu_icon'          => 'dashicons-beer',
 		'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+		'show_in_rest'       => true,
 	);
 
 	register_post_type( 'beer', $args );
