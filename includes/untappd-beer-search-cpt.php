@@ -301,6 +301,7 @@ function ubs_save_beer( $beer_data ) {
 	$post_data = array(
 		'post_type'    => 'beer',
 		'post_title'   => wp_strip_all_tags( $beer_data['beer_name'] ),
+		'post_excerpt' => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] ) . ' ' . wp_strip_all_tags( $beer_data['beer_name'] ),
 		'post_content' => wp_strip_all_tags( $beer_data['beer_description'] ),
 		'import_id'    => absint( $beer_data['bid'] ),
 		'post_status'  => 'publish',
