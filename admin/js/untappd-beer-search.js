@@ -6,10 +6,26 @@ jQuery(document).ready(function ($) {
 		$("#ubs-search .spinner").addClass("is-active");
 		$("#ubs-search [type=submit]").attr("disabled", true);
 
+		var beer_name = $('#beer-name').val();
+		var options = $("#beer-names option");
+		var alko_id = null;
+
+		// Loop thorugh the datalist options to find out the selected option.
+		// Get the data attribute to find out Alko product ID.
+		for (var i = 0; i < options.length; i++) {
+			var option = options[i];
+
+			if (option.innerText === beer_name) {
+				alko_id = option.getAttribute('data-alko-id');
+				break;
+			}
+		}
+
 		var data = {
 			action: 'ubs_get_search_results',
-			beer_name: $('#beer-name').val(),
+			beer_name: beer_name,
 			ubs_nonce: $('#ubs_search_nonce').val(),
+			alko_id: alko_id
 		};
 
 		$.post(ajaxurl, data, function (response) {
