@@ -145,7 +145,8 @@ add_action( 'init', 'ubs_register_post_type' );
  */
 function ubs_set_custom_beer_columns( $columns ) {
 	unset( $columns['date'] );
-	$columns['link']   = __( 'Untappd Link', 'ubs' );
+	$columns['alko']   = __( 'Alko', 'ubs' );
+	$columns['link']   = __( 'Untappd', 'ubs' );
 	$columns['abv']    = __( 'ABV%', 'ubs' );
 	$columns['rating'] = __( 'Rating', 'ubs' );
 
@@ -172,6 +173,14 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 			$beer_slug = get_post_meta( $post_id, 'beer_slug', true );
 			$beer_id   = get_post_meta( $post_id, 'bid', true );
 			echo '<a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . absint( $beer_id ) . ' <span class="dashicons dashicons-external"></span></a>';
+			break;
+		case 'alko':
+			$alko_id = get_post_meta( $post_id, 'alko_id', true );
+			if ( false === empty( $alko_id ) ) {
+				echo '<a target="_blank" href="https://www.alko.fi/tuotteet/' . absint( $alko_id ) . '">' . absint( $alko_id ) . ' <span class="dashicons dashicons-external"></span></a>';
+			} else {
+				esc_html_e( 'N/A', 'ubs' );
+			}
 			break;
 	}
 }
@@ -214,9 +223,10 @@ add_action( 'pre_get_posts', 'ubs_sort_by_custom_column' );
  * Create (or update) a beer as custom post.
  *
  * @param  array $beer_data Raw beer data from Untappd.
+ * @param  int   $alko_id   Alko product number.
  * @return int|WP_Error Insert post status.
  */
-function ubs_save_beer( $beer_data ) {
+function ubs_save_beer( $beer_data, $alko_id = false ) {
 
 	// Determine basic taxonomy data.
 	$tax_input = array(
@@ -303,7 +313,6 @@ function ubs_save_beer( $beer_data ) {
 		'post_title'   => wp_strip_all_tags( $beer_data['beer_name'] ),
 		'post_excerpt' => wp_strip_all_tags( $beer_data['brewery']['brewery_name'] ) . ' ' . wp_strip_all_tags( $beer_data['beer_name'] ),
 		'post_content' => wp_strip_all_tags( $beer_data['beer_description'] ),
-		'import_id'    => absint( $beer_data['bid'] ),
 		'post_status'  => 'publish',
 		'tax_input'    => $tax_input,
 	);
@@ -317,6 +326,15 @@ function ubs_save_beer( $beer_data ) {
 	unset( $post_meta['similar'] );
 	unset( $post_meta['friends'] );
 	$post_data['meta_input'] = $post_meta;
+
+	/**
+	 * If Alko product number known, try and use it as the post ID for the post
+	 * to be created.
+	 */
+	if ( false !== $alko_id ) {
+		$post_data['import_id']             = $alko_id;
+		$post_data['meta_input']['alko_id'] = absint( $alko_id );
+	}
 
 	// Determine if the beer has been saved before.
 	$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_data['bid'] );

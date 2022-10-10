@@ -45,7 +45,8 @@ jQuery(document).ready(function ($) {
 
 		var data = {
 			action: 'ubs_save_selected_results',
-			beer_ids: $('input[name="beer-id[]"]:checked').serialize(),
+			beer_id: $('input[name="beer-id[]"]:checked').val(),
+			alko_id: $('#alko_id').val(),
 			ubs_nonce: $('#ubs_save_nonce').val(),
 		};
 
@@ -54,7 +55,6 @@ jQuery(document).ready(function ($) {
 			id = id.replace('beer-check-', '');
 			$('#beer-save-' + id).html('<span class="spinner is-active" style="float:none; height: 1em; width: 1em; background-size: 1em; margin:0;"></span>');
 		});
-
 
 		$.post(ajaxurl, data, function (response) {
 
@@ -69,7 +69,6 @@ jQuery(document).ready(function ($) {
 			});
 
 			$("#ubs-search-results .spinner").removeClass("is-active");
-			$("#ubs-search-results [type=submit]").attr("disabled", false);
 		});
 
 		return false;
