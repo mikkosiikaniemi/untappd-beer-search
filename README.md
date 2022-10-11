@@ -23,3 +23,4 @@ Contains ability to import [Alko product catalog](https://www.alko.fi/valikoimat
 - [ ] Search for multiple beers at once (textarea input instead of text)
 - [ ] Replace jQuery with native JavaScript
 - [ ] Process the whole Alko catalog in batches, trying to match beers as automatically as possible, skipping already imported beers 
+- [ ] Remove duplicates from Alko product list (mainly due to same product being sold in different size bottles)
