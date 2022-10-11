@@ -475,3 +475,20 @@ function ubs_display_refetched_admin_notice() {
 	endif;
 }
 add_action( 'admin_notices', 'ubs_display_refetched_admin_notice' );
+
+/**
+ * Add beer rating to data returned by REST API.
+ *
+ * @return void
+ */
+function ubs_add_beer_rating_to_rest_data() {
+	register_rest_field(
+		'beer',
+		'rating',
+		array(
+			'get_callback' => 'ubs_get_beer_rating',
+			'schema'       => null,
+		)
+	);
+}
+add_action( 'rest_api_init', 'ubs_add_beer_rating_to_rest_data' );

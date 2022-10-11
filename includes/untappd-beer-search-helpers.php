@@ -37,3 +37,13 @@ function ubs_maybe_get_beer_cpt_id( $beer_id ) {
 	// If no posts found, return false.
 	return false;
 }
+
+/**
+ * Get beer Untappd rating score (from post meta).
+ *
+ * @param  object $object Post object.
+ * @return string         Rating score.
+ */
+function ubs_get_beer_rating( $object ) {
+	return get_post_meta( $object['id'], 'rating_score', true );
+}

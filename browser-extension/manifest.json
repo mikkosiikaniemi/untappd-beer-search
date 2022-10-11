@@ -1,0 +1,24 @@
+{
+
+  "manifest_version": 2,
+  "name": "Untappd Beer Ratings for Alko",
+  "version": "1.0",
+
+  "description": "Show Untappd beer ratings in Alko website product catalog.",
+
+  "icons": {
+    "48": "icons/untappd-alko-48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.alko.fi/*"],
+      "js": ["untappd-alko.js"]
+    }
+  ],
+
+  "permissions": [
+    "https://demo.local/"
+  ]
+
+}
