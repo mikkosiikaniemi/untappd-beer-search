@@ -31,24 +31,27 @@ product_cards.forEach(function (card) {
 		name_without_suffixes = name_without_suffixes.trim();
 	});
 
-	// Injecr rating, just a random one for now.
-	const product_image_wrap = card.querySelector('.mc-image');
-	const rating = document.createElement("div");
-	rating.classList.add("untappd-rating");
-	rating.textContent = '⭐' + (Math.random() * (5 - 1) + 1).toFixed(2);
-	product_image_wrap.appendChild(rating);
+	// Make AJAX request to local backend to get beer rating by Alko product ID.
+	const xhr = new XMLHttpRequest();
+	const url = 'https://demo.local/wp-json/wp/v2/beer/' + product_id;
+	xhr.open('GET', url, true);
+	xhr.setRequestHeader("Content-type", "application/json");
+	xhr.send(null);
 
-	/*
-	if (product_id == '703795') {
-		const xhr = new XMLHttpRequest();
-		const url = 'https://demo.local/wp-json/wp/v2/search/?subtype=beer&search=' + encodeURI(name_without_suffixes);
-		xhr.open('GET', url, true);
-		xhr.setRequestHeader("Content-type", "application/json");
-		xhr.send(null);
+	xhr.onreadystatechange = (e) => {
 
-		xhr.onreadystatechange = (e) => {
-			console.log(xhr.responseText)
+		// If local backed responds with HTTP 200, we get rating.
+		if (200 === xhr.status) {
+			// Inject rating.
+			const product_image_wrap = card.querySelector('.mc-image');
+			const rating = document.createElement("div");
+			rating.classList.add("untappd-rating");
+
+			const beer_data = JSON.parse(xhr.responseText);
+			const rating_score = beer_data.rating;
+			let rating_score_two_digits = new Intl.NumberFormat('en-US', { minimumSignificantDigits: 3, maximumSignificantDigits: 3 }).format(rating_score);
+			rating.textContent = '⭐' + rating_score_two_digits;
+			product_image_wrap.appendChild(rating);
 		}
 	}
-	*/
 });
