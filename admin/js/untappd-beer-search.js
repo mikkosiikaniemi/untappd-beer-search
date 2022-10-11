@@ -85,4 +85,26 @@ jQuery(document).ready(function ($) {
 		element.preventDefault();
 		$('input[name="beer-id[]"]').prop("checked", false);
 	});
+
+	// Populate search field with first Alko product not yet saved.
+	$(document).on('click', '#ubs-alko-populate', function (element) {
+		element.preventDefault();
+
+		$("#ubs-search .spinner").addClass("is-active");
+		$("#ubs-alko-populate").attr("disabled", true);
+
+		var data = {
+			action: 'ubs_populate_alko_product',
+			ubs_nonce: $('#ubs_search_nonce').val(),
+		};
+
+		$.post(ajaxurl, data, function (response) {
+			$('#beer-name').val(response);
+			$('#ubs-search').submit();
+			$("#ubs-search .spinner").removeClass("is-active");
+			$("#ubs-alko-populate").attr("disabled", false);
+		});
+
+		return false;
+	});
 });

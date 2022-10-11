@@ -45,6 +45,12 @@ function ubs_render_search_page() {
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Search Untappd', 'ubs' ); ?></h1>
 		<p><?php echo wp_kses_post( 'Search Untappd for a beer (by name). For best results, include brewery name in the beginning, e.g. <em>Mallaskoski Jeriko Cherry Sour Wild Ale</em>.', 'ubs' ); ?></p>
+		<p>
+			<?php
+			// translators: number of beers in Alko catalog not yet saved.
+			wp_kses_post( sprintf( __( 'There are %d beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', 'ubs' ), ( count( get_option( 'ubs_beers', true ) ) - wp_count_posts( 'beer' )->publish ) ) );
+			?>
+		</p>
 		<form id="ubs-search" action="" method="post">
 			<label for="beer-name" class="screen-reader-text"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
 			<input type="text" name="beer_name" size="50" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
@@ -60,6 +66,7 @@ function ubs_render_search_page() {
 			</datalist>
 			<?php wp_nonce_field( 'ubs_search', 'ubs_search_nonce' ); ?>
 			<button id="ubs-search-submit" class="button button-primary" type="submit"><?php esc_attr_e( 'Search', 'ubs' ); ?></button>
+			<button id="ubs-alko-populate" class="button button-secondary" type=""><?php esc_attr_e( 'Populate', 'ubs' ); ?></button>
 			<span class="spinner" style="float:none;"></span>
 		</form>
 		<div id="ubs-untappd-response" style="margin-top: 1em;"></div>
@@ -82,6 +89,7 @@ function ubs_render_search_results( $result_array, $alko_id = false ) {
 		// translators: amount of search results.
 		$html .= __( 'No beers found.', 'ubs' );
 		$html .= '</p>';
+		$html .= '<p>Hourly API requests limit remaining: ' . $result_array['limit_remaining'] . '</p>';
 		return $html;
 	}
 
@@ -103,7 +111,7 @@ function ubs_render_search_results( $result_array, $alko_id = false ) {
 		$html .= '<label for="alko_id" style="display: block;">';
 		$html .= __( 'Please enter Alko product number to associate with the beer.', 'ubs' );
 		$html .= '</label>';
-		$html .= '<input type="text" pattern="[0-9]+" id="alko_id" name="alko_id" />';
+		$html .= '<input type="text" pattern="[0-9]+" id="alko_id" name="alko_id" required />';
 	}
 	$html .= '</p>';
 
@@ -168,16 +176,16 @@ function ubs_render_search_results( $result_array, $alko_id = false ) {
 		$html .= $beer_id;
 		$html .= '</td>';
 		$html .= '<td>';
-		$html .= $beer['brewery']['brewery_name'];
+		$html .= esc_attr( $beer['brewery']['brewery_name'] );
 		$html .= '</td>';
 		$html .= '<td>';
 
 		$beer_url = esc_url( 'https://untappd.com/b/' . $beer['beer']['beer_slug'] . '/' . $beer_id );
 
-		$html .= '<a target="_blank" href="' . $beer_url . '">' . $beer['beer']['beer_name'] . ' <span class="dashicons dashicons-external"></span></a>';
+		$html .= '<a target="_blank" href="' . $beer_url . '">' . esc_attr( $beer['beer']['beer_name'] ) . ' <span class="dashicons dashicons-external"></span></a>';
 		$html .= '</td>';
 		$html .= '<td>';
-		$html .= $beer['beer']['beer_style'];
+		$html .= esc_attr( $beer['beer']['beer_style'] );
 		$html .= '</td>';
 		$html .= '<td>';
 		$html .= number_format( $beer['beer']['beer_abv'], 1 );
@@ -275,6 +283,7 @@ function ubs_process_ajax_search_results() {
 	// Render search results, hang on to the Alko product number.
 	$results_html = ubs_render_search_results( $search_result, $alko_id );
 
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo $results_html;
 	wp_die();
 }
@@ -311,3 +320,29 @@ function ubs_process_ajax_save_results() {
 	wp_die();
 }
 add_action( 'wp_ajax_ubs_save_selected_results', 'ubs_process_ajax_save_results' );
+
+/**
+ * Process AJAX request to search for a beer.
+ *
+ * Echo results HTML.
+ *
+ * @return void
+ */
+function ubs_populate_search_field_with_alko_product() {
+
+	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_search' ) ) {
+		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+	}
+
+	$beers = get_option( 'ubs_beers', true );
+
+	foreach ( $beers as $alko_id => $beer_name ) {
+		if ( false === get_post_status( $alko_id ) ) {
+			echo esc_attr( html_entity_decode( $beer_name, ENT_QUOTES, 'UTF-8' ) );
+			wp_die();
+		}
+	}
+
+	wp_die();
+}
+add_action( 'wp_ajax_ubs_populate_alko_product', 'ubs_populate_search_field_with_alko_product' );
