@@ -492,3 +492,13 @@ function ubs_add_beer_rating_to_rest_data() {
 	);
 }
 add_action( 'rest_api_init', 'ubs_add_beer_rating_to_rest_data' );
+
+/**
+ * Return more then default 10 results when requesting REST for beers.
+ */
+function rest_posts_per_page( $args, $request ) {
+	$max                    = max( (int) $request->get_param( 'per_page' ), 2000 );
+	$args['posts_per_page'] = $max;
+	return $args;
+}
+add_filter( 'rest_beer_query', 'rest_posts_per_page', 10, 2 );
