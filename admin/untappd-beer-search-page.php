@@ -77,11 +77,12 @@ function ubs_render_search_page() {
 /**
  * Generate the HTML code to render the search results.
  *
- * @param  array $result_array Search results.
- * @param  int   $alko_id      Alko product ID pre-selected in search input.
- * @return mixed $html         HTML-formatted table.
+ * @param  array  $result_array Search results.
+ * @param  int    $alko_id      Alko product ID pre-selected in search input.
+ * @param  string $beer_name    Beer name that was searched for.
+ * @return mixed  $html         HTML-formatted table.
  */
-function ubs_render_search_results( $result_array, $alko_id = false ) {
+function ubs_render_search_results( $result_array, $alko_id = false, $beer_name ) {
 
 	// If no beers found, return empty result early.
 	if ( 0 === $result_array['beers']['count'] ) {
@@ -111,7 +112,18 @@ function ubs_render_search_results( $result_array, $alko_id = false ) {
 		$html .= '<label for="alko_id" style="display: block;">';
 		$html .= __( 'Please enter Alko product number to associate with the beer.', 'ubs' );
 		$html .= '</label>';
-		$html .= '<input type="text" pattern="[0-9]+" id="alko_id" name="alko_id" required />';
+
+		// Provide options from Alko catalog to select ID from.
+		$html .= '<select id="alko_id" name="alko_id" required>';
+
+		// Make fuzzy search for name against Alko catalog.
+		$fuzzy_matches = ubs_search_alko_catalog_for_name( $beer_name );
+		foreach ( $fuzzy_matches as $match_id => $match_data ) {
+			$html .= '<option value="' . $match_data['alko_id'] . '">';
+			$html .= esc_attr( $match_data['alko_id'] . ' — ' . $match_data['beer_name'] );
+			$html .= '</option>';
+		}
+		$html .= '</select>';
 	}
 	$html .= '</p>';
 
@@ -287,7 +299,7 @@ function ubs_process_ajax_search_results() {
 	$search_result = ubs_search_beer_in_untappd( $beer_name );
 
 	// Render search results, hang on to the Alko product number.
-	$results_html = ubs_render_search_results( $search_result, $alko_id );
+	$results_html = ubs_render_search_results( $search_result, $alko_id, $beer_name );
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo $results_html;
