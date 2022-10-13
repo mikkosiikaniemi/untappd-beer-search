@@ -1,6 +1,3 @@
-// Select all Alko product cards.
-const product_cards = document.querySelectorAll('.mini-card-wrap');
-
 // Add Untappd rating CSS styles.
 var style = document.createElement('style');
 style.innerHTML = `
@@ -17,41 +14,43 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// For each product card, inject rating.
-product_cards.forEach(function (card) {
-	const product_name = card.querySelector('.mc-name');
-	let product_id = card.querySelector('.product-data-container').getAttribute('data-alkoproduct');
+// Make AJAX request to local REST API to get beer rating by Alko product ID.
+const xhr = new XMLHttpRequest();
+const url = 'https://demo.local/wp-json/wp/v2/beer';
+xhr.open('GET', url, true);
+xhr.setRequestHeader("Content-type", "application/json");
+xhr.send(null);
 
-	const suffixes_to_remove = ['tölkki'];
-	name_without_suffixes = '';
+xhr.onreadystatechange = (e) => {
 
-	// Remove suffixes from beer name.
-	suffixes_to_remove.forEach(function (suffix) {
-		name_without_suffixes = product_name.textContent.replace(suffix, '');
-		name_without_suffixes = name_without_suffixes.trim();
-	});
+	// If local backed responds with HTTP 200, we get something.
+	if (200 === xhr.status) {
+		// Parse JSON response for beer array.
+		const beers = JSON.parse(xhr.responseText);
 
-	// Make AJAX request to local backend to get beer rating by Alko product ID.
-	const xhr = new XMLHttpRequest();
-	const url = 'https://demo.local/wp-json/wp/v2/beer/' + product_id;
-	xhr.open('GET', url, true);
-	xhr.setRequestHeader("Content-type", "application/json");
-	xhr.send(null);
+		// Select all Alko product cards on page.
+		const product_cards = document.querySelectorAll('.mini-card-wrap');
 
-	xhr.onreadystatechange = (e) => {
+		// For each product cars, search for beer by Alko product ID.
+		product_cards.forEach(function (card) {
 
-		// If local backed responds with HTTP 200, we get rating.
-		if (200 === xhr.status) {
-			// Inject rating.
-			const product_image_wrap = card.querySelector('.mc-image');
-			const rating = document.createElement("div");
-			rating.classList.add("untappd-rating");
+			// Get the Alko product ID from product card.
+			const product_id = card.querySelector('.product-data-container').getAttribute('data-alkoproduct');
 
-			const beer_data = JSON.parse(xhr.responseText);
-			const rating_score = beer_data.rating;
-			let rating_score_two_digits = new Intl.NumberFormat('en-US', { minimumSignificantDigits: 3, maximumSignificantDigits: 3 }).format(rating_score);
-			rating.textContent = '⭐' + rating_score_two_digits;
-			product_image_wrap.appendChild(rating);
-		}
+			// Find corresponding beer (from array returned by REST API call).
+			const beer = beers.find(x => x.id == product_id);
+
+			// If beer found, inject rating.
+			if (beer) {
+				const product_image_wrap = card.querySelector('.mc-image');
+				const rating = document.createElement("div");
+				rating.classList.add("untappd-rating");
+
+				const rating_score = beer.rating;
+				let rating_score_two_digits = new Intl.NumberFormat('en-US', { minimumSignificantDigits: 3, maximumSignificantDigits: 3 }).format(rating_score);
+				rating.textContent = '⭐' + rating_score_two_digits;
+				product_image_wrap.appendChild(rating);
+			}
+		});
 	}
-});
+}
