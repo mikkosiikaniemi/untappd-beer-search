@@ -84,6 +84,14 @@ function ubs_render_search_page() {
  */
 function ubs_render_search_results( $result_array, $alko_id = false, $beer_name ) {
 
+	// If rate limit reached, return early.
+	if ( '0' === $result_array['limit_remaining'] ) {
+		$html  = '<p>';
+		$html .= esc_attr( $result_array['error_detail'] );
+		$html .= '</p>';
+		return $html;
+	}
+
 	// If no beers found, return empty result early.
 	if ( 0 === $result_array['beers']['count'] ) {
 		$html = '<p>';

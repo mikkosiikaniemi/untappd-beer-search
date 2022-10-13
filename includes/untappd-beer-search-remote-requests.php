@@ -41,7 +41,12 @@ function ubs_search_beer_in_untappd( $beer_name ) {
 
 	$decoded_response = json_decode( $untappd_response_body, true );
 
-	$return_array                    = $decoded_response['response'];
+	if ( '0' === $untappd_api_limit_remaining ) {
+		$return_array = $decoded_response['meta'];
+	} else {
+		$return_array = $decoded_response['response'];
+	}
+
 	$return_array['limit_remaining'] = $untappd_api_limit_remaining;
 
 	return $return_array;
