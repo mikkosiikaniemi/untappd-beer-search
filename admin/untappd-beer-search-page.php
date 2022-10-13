@@ -53,7 +53,7 @@ function ubs_render_search_page() {
 		</p>
 		<form id="ubs-search" action="" method="post">
 			<label for="beer-name" class="screen-reader-text"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
-			<input type="text" name="beer_name" size="50" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
+			<input type="text" name="beer_name" size="60" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
 			<datalist id="beer-names">
 				<?php
 				$beers = get_option( 'ubs_beers' );
