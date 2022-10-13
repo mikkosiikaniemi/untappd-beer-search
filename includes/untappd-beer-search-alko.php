@@ -43,15 +43,22 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 		$beer_wort_abv_index       = false;
 		$beers                     = array();
 
+		// Remove certain suffixes from beer name.
+		// This makes searching Untappd more reliable.
 		$remove_these_suffixes = array(
 			'tölkki',
 			'viinipussi',
 			'hanapakkaus',
 			'muovipullo',
 			'tynnyri',
+		);
+
+		// Skip products containing certain suffix (mainly multipacks).
+		$skip_products_with_these_suffixes = array(
 			'6-pack',
 			'8-pack',
 			'12-pack',
+			'18-pack',
 			'24-pack',
 		);
 
@@ -74,6 +81,21 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 			if ( '600' === $row[ $price_list_category_index ] || false === empty( $row[ $beer_wort_abv_index ] ) ) {
 				$beer_name = esc_attr( $row[1] );
 				$brewery   = esc_attr( $row[2] );
+
+				// Check if product name contains suffix to skip.
+				$skip_product = false;
+				foreach ( $skip_products_with_these_suffixes as $suffix ) {
+					if ( false !== stripos( $beer_name, $suffix ) ) {
+						vincit_wp_debug( $beer_name );
+						$skip_product = true;
+						continue;
+					}
+				}
+
+				// If product name contains certain suffix, skip it.
+				if ( true === $skip_product ) {
+					continue;
+				}
 
 				foreach ( $remove_these_suffixes as $suffix ) {
 					$suffix_position = strrpos( $beer_name, $suffix );
