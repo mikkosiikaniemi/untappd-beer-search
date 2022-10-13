@@ -48,7 +48,7 @@ function ubs_render_search_page() {
 		<p>
 			<?php
 			// translators: number of beers in Alko catalog not yet saved.
-			wp_kses_post( sprintf( __( 'There are %d beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', 'ubs' ), ( count( get_option( 'ubs_beers', true ) ) - wp_count_posts( 'beer' )->publish ) ) );
+			echo wp_kses_post( sprintf( __( 'There are %d beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', 'ubs' ), ( count( get_option( 'ubs_beers', true ) ) - wp_count_posts( 'beer' )->publish ) ) );
 			?>
 		</p>
 		<form id="ubs-search" action="" method="post">
@@ -137,6 +137,9 @@ function ubs_render_search_results( $result_array, $alko_id = false ) {
 	$html .= __( 'ABV%', 'ubs' );
 	$html .= '</th>';
 	$html .= '<th>';
+	$html .= __( 'IBU', 'ubs' );
+	$html .= '</th>';
+	$html .= '<th>';
 	$html .= __( 'Already saved?', 'ubs' );
 	$html .= '</th>';
 	$html .= '</thead>';
@@ -189,6 +192,9 @@ function ubs_render_search_results( $result_array, $alko_id = false ) {
 		$html .= '</td>';
 		$html .= '<td>';
 		$html .= number_format( $beer['beer']['beer_abv'], 1 );
+		$html .= '</td>';
+		$html .= '<td>';
+		$html .= number_format( $beer['beer']['beer_ibu'], 1 );
 		$html .= '</td>';
 		$html .= '<td id="beer-save-' . $beer_id . '">';
 
@@ -336,9 +342,10 @@ function ubs_populate_search_field_with_alko_product() {
 
 	$beers = get_option( 'ubs_beers', true );
 
-	foreach ( $beers as $alko_id => $beer_name ) {
-		if ( false === get_post_status( $alko_id ) ) {
-			echo esc_attr( html_entity_decode( $beer_name, ENT_QUOTES, 'UTF-8' ) );
+	while ( $beers ) {
+		$random_beer = array_rand( $beers );
+		if ( false === get_post_status( $random_beer ) ) {
+			echo html_entity_decode( $beers[ $random_beer ], ENT_QUOTES, 'UTF-8' );
 			wp_die();
 		}
 	}
