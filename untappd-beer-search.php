@@ -28,6 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-cpt.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-remote-requests.php';
 require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-page.php';
+require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-top.php';
 require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-settings.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-helpers.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-alko.php';

@@ -145,9 +145,16 @@ add_action( 'init', 'ubs_register_post_type' );
  */
 function ubs_set_custom_beer_columns( $columns ) {
 	unset( $columns['date'] );
-	$columns['alko']   = __( 'Alko', 'ubs' );
-	$columns['link']   = __( 'Untappd', 'ubs' );
-	$columns['abv']    = __( 'ABV%', 'ubs' );
+	$columns['link'] = __( 'Links', 'ubs' );
+	$columns['abv']  = __( 'ABV%', 'ubs' );
+
+	$untappd_settings = get_option( 'ubs_settings' );
+
+	// Don't add the column if favorite store has not been defined.
+	if ( false === empty( $untappd_settings['ubs_setting_alko_favorite_store'] ) ) {
+		$columns['availability'] = __( 'Availability', 'ubs' );
+	}
+
 	$columns['rating'] = __( 'Rating', 'ubs' );
 
 	return $columns;
@@ -172,14 +179,35 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 		case 'link':
 			$beer_slug = get_post_meta( $post_id, 'beer_slug', true );
 			$beer_id   = get_post_meta( $post_id, 'bid', true );
-			echo '<a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . absint( $beer_id ) . ' <span class="dashicons dashicons-external"></span></a>';
-			break;
-		case 'alko':
+			esc_html_e( 'Untappd', 'ubs' );
+			echo ' ';
+			echo '<a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . absint( $beer_id ) . ' <span class="dashicons dashicons-external"></span></a><br/>';
+
 			$alko_id = get_post_meta( $post_id, 'alko_id', true );
+			esc_html_e( 'Alko' );
+			echo ' ';
 			if ( false === empty( $alko_id ) ) {
 				echo '<a target="_blank" href="https://www.alko.fi/tuotteet/' . absint( $alko_id ) . '">' . absint( $alko_id ) . ' <span class="dashicons dashicons-external"></span></a>';
 			} else {
 				esc_html_e( 'N/A', 'ubs' );
+			}
+			break;
+		case 'availability':
+			$untappd_settings = get_option( 'ubs_settings' );
+
+			$favorite_store_empty = empty( $untappd_settings['ubs_setting_alko_favorite_store'] );
+
+			// Don't add the action if favorite store has not been defined.
+			if ( true === $favorite_store_empty ) {
+				esc_html_e( 'N/A', 'ubs' );
+			} else {
+				$amount = get_post_meta( $post_id, 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'], true );
+
+				if ( empty( $amount ) && '0' !== $amount ) {
+					esc_html_e( 'N/A', 'ubs' );
+				} else {
+					echo absint( $amount );
+				}
 			}
 			break;
 	}
@@ -478,6 +506,116 @@ function ubs_display_refetched_admin_notice() {
 	endif;
 }
 add_action( 'admin_notices', 'ubs_display_refetched_admin_notice' );
+
+/**
+ * Add "re-fetch from Untappd" to beer CPT row actions.
+ *
+ * @param  array  $actions Original post row actions.
+ * @param  object $post    Post object.
+ * @return array  $actions New actions.
+ */
+function ubs_add_update_store_availability_action( $actions, $post ) {
+
+	// Check that we're on beer post type.
+	if ( 'beer' === $post->post_type ) {
+
+		$untappd_settings = get_option( 'ubs_settings' );
+
+		// Don't add the action if favorite store has not been defined.
+		if ( false === isset( $untappd_settings['ubs_setting_alko_favorite_store'] ) || empty( $untappd_settings['ubs_setting_alko_favorite_store'] ) ) {
+			return $actions;
+		}
+
+		// Build link URL.
+		$url = admin_url( 'post.php?post_type=beer&post=' . $post->ID );
+
+		// Add new action argument.
+		$edit_link = add_query_arg( array( 'action' => 'update_store_availability' ), $url );
+		$edit_link = add_query_arg( '_wpnonce', wp_create_nonce( 'updated_store_availability' ), $edit_link );
+
+		// Define new action link.
+		$actions['update_store_availability'] = '<a href="' . esc_url( $edit_link ) . '">' . __( 'Update store availability', 'ubs' ) . '</a>';
+	}
+	return $actions;
+}
+add_filter( 'post_row_actions', 'ubs_add_update_store_availability_action', 10, 2 );
+
+/**
+ * Re-fetch beer info from Untappd.
+ *
+ * @param  int $post_id Post ID.
+ * @return void
+ */
+function ubs_update_store_availability_for_beer( $post_id ) {
+
+	// Get Alko ID if exists.
+	$alko_id = get_post_meta( $post_id, 'alko_id', true );
+
+	// Get beer info from Untappd.
+	$alko_availability = ubs_update_alko_availability( $alko_id, $post_id );
+}
+
+/**
+ * Handle "update_store_availability" post row action.
+ *
+ * @param  int $post_id Post ID.
+ * @return void
+ */
+function ubs_handle_update_store_availability_action( $post_id ) {
+
+	ubs_update_store_availability_for_beer( $post_id );
+
+	// Remove "update_store_availability" query string argument.
+	$redirect_url = remove_query_arg( array( 'update_store_availability' ), wp_get_referer() );
+
+	// Add "updated_store_availability" query string argument to enable admin notice display.
+	$redirect_url = add_query_arg( array( 'updated_store_availability' => 'true' ), $redirect_url );
+
+	// Make redirect.
+	wp_safe_redirect( $redirect_url );
+	exit;
+}
+add_action( 'post_action_update_store_availability', 'ubs_handle_update_store_availability_action' );
+
+/**
+ * Add "refetch" to beer CPT bulk actions.
+ *
+ * @param  array $bulk_array Array of bulk actions.
+ * @return array $bulk_array New array of bulk actions.
+ */
+function ubs_add_update_store_availability_bulk_action( $bulk_array ) {
+	$bulk_array['update_store_availability'] = __( 'Update store availability', 'ubs' );
+	return $bulk_array;
+}
+add_filter( 'bulk_actions-edit-beer', 'ubs_add_update_store_availability_bulk_action' );
+
+/**
+ * Handle "update_store_availability" as bulk action.
+ *
+ * @param  string $redirect   URL to be redirected to after action.
+ * @param  string $doaction   Action name.
+ * @param  array  $object_ids Array of object IDs to perform bulk action for.
+ * @return string $redirect   New URL to be redirected to.
+ */
+function ubs_handle_update_store_availability_bulk_action( $redirect, $doaction, $object_ids ) {
+
+	// Let's remove the "update_store_availability" query arg first.
+	$redirect = remove_query_arg( 'update_store_availability', $redirect );
+
+	// If "update_store_availability" bulk action initiated, update_store_availability beer infos.
+	if ( 'update_store_availability' === $doaction ) {
+		foreach ( $object_ids as $post_id ) {
+			$alko_id = get_post_meta( $post_id, 'alko_id', true );
+			ubs_update_alko_availability( $alko_id, $post_id );
+		}
+	}
+
+	// Add query arg in order to display admin notice.
+	$redirect = add_query_arg( array( 'updated_store_availability' => 'true' ), $redirect );
+
+	return $redirect;
+}
+add_filter( 'handle_bulk_actions-edit-beer', 'ubs_handle_update_store_availability_bulk_action', 10, 3 );
 
 /**
  * Add beer rating to data returned by REST API.

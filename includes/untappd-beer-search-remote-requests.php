@@ -83,3 +83,40 @@ function ubs_get_beer_info( $beer_id ) {
 
 	return $return_array;
 }
+
+/**
+ * Scrape single beer availability from Alko website by product & store ID.
+ *
+ * @param  int $alko_id Alko product number.
+ * @param  int $post_id Post ID to update.
+ * @return void
+ */
+function ubs_update_alko_availability( $alko_id, $post_id ) {
+
+	$untappd_settings    = get_option( 'ubs_settings' );
+	$favorite_alko_store = absint( $untappd_settings['ubs_setting_alko_favorite_store'] );
+
+	$alko_store_product_availability_url = 'https://www.alko.fi/INTERSHOP/web/WFS/Alko-OnlineShop-Site/fi_FI/-/EUR/ALKO_ViewStore-Stock?SKU=' . $alko_id . '&StoreID=' . $favorite_alko_store;
+
+	$alko_response = wp_remote_get( $alko_store_product_availability_url );
+
+	if ( is_wp_error( $alko_response ) ) {
+		return new WP_Error( -1, __( 'Alko availability request failed.', 'ubs' ) );
+	}
+
+	// Get the API request response body.
+	$alko_response_body = wp_remote_retrieve_body( $alko_response );
+
+	$amount_matching = preg_match( '/(?<=<span>Tuotem&auml;&auml;r&auml; myym&auml;l&auml;ss&auml;<\/span>)(.*)(?=<\/td>)/m', $alko_response_body, $matches );
+
+	if ( false !== strpos( $matches[0], '-' ) ) {
+		$amount = absint( explode( '-', $matches[0] )[0] );
+	} elseif ( '0' === $matches[0] ) {
+		$amount = 0;
+	} else {
+		$amount = absint( $matches[0] );
+	}
+
+	update_post_meta( $post_id, 'availability_' . $favorite_alko_store, $amount );
+	update_post_meta( $post_id, 'availability_updated', current_time( 'timestamp' ) );
+}
