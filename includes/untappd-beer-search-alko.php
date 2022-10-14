@@ -86,7 +86,6 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 				$skip_product = false;
 				foreach ( $skip_products_with_these_suffixes as $suffix ) {
 					if ( false !== stripos( $beer_name, $suffix ) ) {
-						vincit_wp_debug( $beer_name );
 						$skip_product = true;
 						continue;
 					}
