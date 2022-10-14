@@ -53,7 +53,7 @@ function ubs_initialize_settings() {
 	// Alko price sheet.
 	add_settings_section(
 		'ubs_settings_section_alko',
-		__( 'Alko price sheet', 'ubs' ),
+		__( 'Alko settings', 'ubs' ),
 		'ubs_settings_section_alko_callback',
 		'ubs_settings'
 	);
@@ -62,6 +62,14 @@ function ubs_initialize_settings() {
 		'ubs_setting_alko_price_sheet',
 		__( 'Alko price sheet', 'ubs' ),
 		'ubs_setting_alko_price_sheet',
+		'ubs_settings',
+		'ubs_settings_section_alko'
+	);
+
+	add_settings_field(
+		'ubs_setting_alko_favorite_store',
+		__( 'Favorite Alko store (ID)', 'ubs' ),
+		'ubs_setting_alko_favorite_store',
 		'ubs_settings',
 		'ubs_settings_section_alko'
 	);
@@ -132,6 +140,19 @@ function ubs_setting_alko_price_sheet() {
 			<option value=""><?php esc_html_e( 'Upload price sheet to Media Library first.', 'ubs' ); ?></option>
 			<?php endif; ?>
 	</select>
+	<?php
+}
+
+/**
+ * Render favorite Alko store setting.
+ *
+ * @return void
+ */
+function ubs_setting_alko_favorite_store() {
+	$options = get_option( 'ubs_settings' );
+	?>
+	<input type="text" size="6" name="ubs_settings[ubs_setting_alko_favorite_store]" value="<?php echo isset( $options['ubs_setting_alko_favorite_store'] ) ? esc_attr( $options['ubs_setting_alko_favorite_store'] ) : ''; ?>" />
+	<p class="description"><?php _e( 'Enter Alko store ID. You can extract the numeric ID from Alko store URL by first <a target="_blank" href="https://www.alko.fi/myymalat-palvelut">selecting a store</a>.' ); ?></p>
 	<?php
 }
 
