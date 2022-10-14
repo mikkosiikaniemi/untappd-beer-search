@@ -53,7 +53,7 @@ jQuery(document).ready(function ($) {
 		$('input[name="beer-id[]"]:checked').each(function (e) {
 			id = $(this).attr("id");
 			id = id.replace('beer-check-', '');
-			$('#beer-save-' + id).html('<span class="spinner is-active" style="float:none; height: 1em; width: 1em; background-size: 1em; margin:0;"></span>');
+			$('#beer-save-' + id).html('<span class="spinner is-active"></span>');
 		});
 
 		$.post(ajaxurl, data, function (response) {

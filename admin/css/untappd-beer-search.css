@@ -1,0 +1,36 @@
+#beer-name {
+	min-width: 70ch;
+}
+
+label[for="alko_id"] {
+	display: block;
+}
+
+select#alko_id {
+	min-width: 70ch;
+}
+
+.spinner {
+	float: none;
+}
+
+#ubs-untappd-response {
+	margin-top: 1em;
+}
+
+.ubs-search-results {
+	margin-bottom: .5em;
+}
+
+.dashicons {
+	font-size: inherit;
+	vertical-align: baseline;
+}
+
+td[id^="beer-save"] .spinner {
+	float: none;
+	height: 1em;
+	width: 1em;
+	background-size: 1em;
+	margin: 0;
+}

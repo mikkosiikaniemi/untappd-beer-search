@@ -32,6 +32,7 @@ function ubs_enqueue_scripts( $hook ) {
 		return;
 	}
 	wp_enqueue_script( 'ubs-ajax', plugin_dir_url( __FILE__ ) . '/js/untappd-beer-search.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . 'js/untappd-beer-search.js' ), true );
+	wp_enqueue_style( 'ubs-styles', plugin_dir_url( __FILE__ ) . '/css/untappd-beer-search.css', array(), filemtime( plugin_dir_path( __FILE__ ) . 'css/untappd-beer-search.css' ) );
 }
 add_action( 'admin_enqueue_scripts', 'ubs_enqueue_scripts' );
 
@@ -53,7 +54,7 @@ function ubs_render_search_page() {
 		</p>
 		<form id="ubs-search" action="" method="post">
 			<label for="beer-name" class="screen-reader-text"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
-			<input type="text" name="beer_name" size="60" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
+			<input type="text" name="beer_name" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
 			<datalist id="beer-names">
 				<?php
 				$beers = get_option( 'ubs_beers' );
@@ -67,9 +68,9 @@ function ubs_render_search_page() {
 			<?php wp_nonce_field( 'ubs_search', 'ubs_search_nonce' ); ?>
 			<button id="ubs-search-submit" class="button button-primary" type="submit"><?php esc_attr_e( 'Search', 'ubs' ); ?></button>
 			<button id="ubs-alko-populate" class="button button-secondary" type=""><?php esc_attr_e( 'Populate', 'ubs' ); ?></button>
-			<span class="spinner" style="float:none;"></span>
+			<span class="spinner"></span>
 		</form>
-		<div id="ubs-untappd-response" style="margin-top: 1em;"></div>
+		<div id="ubs-untappd-response"></div>
 	</div>
 	<?php
 }
@@ -114,11 +115,11 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	$html .= '<p>';
 	if ( false !== $alko_id ) {
 		// translators: Alko product number.
-		$html .= sprintf( __( 'Alko product number <kbd>%d</kbd> will be associated with the selected beer.', 'ubs' ), $alko_id );
+		$html .= sprintf( __( 'Alko product number <kbd>%1$d</kbd> (<a target="_blank" href="https://www.alko.fi/tuotteet/%1$d">Alko product link<span class="dashicons dashicons-external"></span></a>) will be associated with the selected beer.', 'ubs' ), $alko_id );
 		$html .= '<input type="hidden" id="alko_id" name="alko_id" value="' . $alko_id . '" />';
 	} else {
-		$html .= '<label for="alko_id" style="display: block;">';
-		$html .= __( 'Please enter Alko product number to associate with the beer.', 'ubs' );
+		$html .= '<label for="alko_id">';
+		$html .= __( 'Please select Alko product number to associate with the beer.', 'ubs' );
 		$html .= '</label>';
 
 		// Provide options from Alko catalog to select ID from.
@@ -135,7 +136,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	}
 	$html .= '</p>';
 
-	$html .= '<table style="margin-bottom: .5em;" class="widefat striped">';
+	$html .= '<table class="ubs-search-results widefat striped">';
 
 	$html .= '<thead>';
 	$html .= '<th>';
@@ -205,7 +206,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 
 		$beer_url = esc_url( 'https://untappd.com/b/' . $beer['beer']['beer_slug'] . '/' . $beer_id );
 
-		$html .= '<a target="_blank" href="' . $beer_url . '">' . esc_attr( $beer['beer']['beer_name'] ) . ' <span class="dashicons dashicons-external"></span></a>';
+		$html .= '<a target="_blank" href="' . $beer_url . '">' . esc_attr( $beer['beer']['beer_name'] ) . '<span class="dashicons dashicons-external"></span></a>';
 		$html .= '</td>';
 		$html .= '<td>';
 		$html .= esc_attr( $beer['beer']['beer_style'] );
@@ -235,7 +236,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	$html .= '</table>';
 	$html .= wp_nonce_field( 'ubs_save', 'ubs_save_nonce', true, false );
 	$html .= '<button class="button button-secondary" type="submit">' . __( 'Save selected', 'ubs' ) . '</button>';
-	$html .= '<span class="spinner" style="float:none;"></span>';
+	$html .= '<span class="spinner"></span>';
 	$html .= '</form>';
 
 	$html .= '<p>Hourly API requests limit remaining: ' . $result_array['limit_remaining'] . '</p>';
