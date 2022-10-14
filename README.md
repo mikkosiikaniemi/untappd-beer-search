@@ -6,6 +6,23 @@ A browser extension for Mozilla Firefox is included. The extension is able to in
 
 Contains ability to import [Alko product catalog](https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto) and use it to autocomplete beer search against the Alko catalog.
 
+## Sequence diagram
+```mermaid
+sequenceDiagram
+    participant Untappd
+    participant Alko
+    participant WordPress
+    participant Browser extension
+    WordPress->>+Untappd: Search for beer by name
+    Untappd->>-WordPress: Return beer search results (IDs)
+    WordPress->>+Untappd: Request beer data by ID
+    Untappd->>-WordPress: Return beer data
+    Alko->>WordPress: Alko product info (Excel)
+    Browser extension->>+WordPress: Get beer rating by Alko product ID
+    WordPress->>-Browser extension: Return beer data
+    Browser extension->>Alko: Inject beer rating by Alko product ID to Alko website
+```
+
 ## Features, ideas & to-do
 
 - [x] Settings page for Untappd API credentials
