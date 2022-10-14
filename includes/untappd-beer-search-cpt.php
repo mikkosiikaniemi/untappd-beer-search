@@ -41,7 +41,7 @@ function ubs_register_post_type() {
 		'hierarchical'       => false,
 		'menu_position'      => null,
 		'menu_icon'          => 'dashicons-beer',
-		'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+		'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ),
 		'show_in_rest'       => true,
 	);
 
@@ -385,11 +385,14 @@ function ubs_refetch_beer_info( $post_id ) {
 	// Get beer ID from post meta.
 	$beer_id = get_post_meta( $post_id, 'bid', true );
 
+	// Get Alko ID if exists.
+	$alko_id = get_post_meta( $post_id, 'alko_id', true );
+
 	// Get beer info from Untappd.
 	$beer_info = ubs_get_beer_info( $beer_id );
 
 	// Save beer info.
-	ubs_save_beer( $beer_info['beer'] );
+	ubs_save_beer( $beer_info['beer'], $alko_id );
 }
 
 /**
