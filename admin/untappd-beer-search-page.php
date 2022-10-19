@@ -86,9 +86,9 @@ function ubs_render_search_page() {
 function ubs_render_search_results( $result_array, $alko_id = false, $beer_name ) {
 
 	// If rate limit reached, return early.
-	if ( '0' === $result_array['limit_remaining'] ) {
+	if ( is_wp_error( $result_array ) ) {
 		$html  = '<p>';
-		$html .= esc_attr( $result_array['error_detail'] );
+		$html .= esc_attr( $result_array->get_error_message() );
 		$html .= '</p>';
 		return $html;
 	}
