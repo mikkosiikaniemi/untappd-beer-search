@@ -37,7 +37,6 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 	$alko_prices_data = new SimpleXLSX( $alko_price_sheet_file );
 
 	if ( $alko_prices_data->success() ) {
-		$row_counter               = 0;
 		$header_row_found          = false;
 		$price_list_category_index = false;
 		$beer_wort_abv_index       = false;
@@ -105,10 +104,12 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 
 				$beers[ $row[0] ] = $brewery . ' ' . $beer_name;
 			}
-
-			$row_counter++;
 		}
-		update_option( 'ubs_beers', $beers, false );
+
+		// Remove duplicates.
+		$unique_beers = array_unique( $beers );
+
+		update_option( 'ubs_beers', $unique_beers, false );
 
 	} else {
 		wp_die( esc_html( $alko_prices_data->error() ) );
