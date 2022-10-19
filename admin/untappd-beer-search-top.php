@@ -12,9 +12,28 @@
  * @return void
  */
 function ubs_add_top_available_beers_menu_page() {
-	add_submenu_page( 'edit.php?post_type=beer', __( 'Top available beers', 'ubs' ), __( 'Top available beers', 'ubs' ), 'edit_posts', 'ubs-top-beers', 'ubs_render_top_beers_page' );
+	global $ubs_top_page;
+	$ubs_top_page = add_submenu_page( 'edit.php?post_type=beer', __( 'Top available beers', 'ubs' ), __( 'Top available beers', 'ubs' ), 'edit_posts', 'ubs-top-beers', 'ubs_render_top_beers_page' );
 }
 add_action( 'admin_menu', 'ubs_add_top_available_beers_menu_page' );
+
+/**
+ * Enqueue JavaScript files for AJAXifying requests.
+ *
+ * @param  string $hook Admin page's hook suffix.
+ * @return void
+ */
+function ubs_enqueue_update_availability_scripts( $hook ) {
+	global $ubs_top_page;
+
+	// This is relevant only for the search page. Return early if not there.
+	if ( $hook !== $ubs_top_page ) {
+		return;
+	}
+	wp_enqueue_script( 'ubs-update-availability', plugin_dir_url( __FILE__ ) . '/js/untappd-beer-update-availability.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . 'js/untappd-beer-update-availability.js' ), true );
+	wp_enqueue_style( 'ubs-update-styles', plugin_dir_url( __FILE__ ) . '/css/untappd-beer-update-availability.css', array(), filemtime( plugin_dir_path( __FILE__ ) . 'css/untappd-beer-update-availability.css' ) );
+}
+add_action( 'admin_enqueue_scripts', 'ubs_enqueue_update_availability_scripts' );
 
 /**
  * Render top beers page content.
@@ -24,7 +43,7 @@ add_action( 'admin_menu', 'ubs_add_top_available_beers_menu_page' );
 function ubs_render_top_beers_page() {
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Top beers available', 'ubs' ); ?></h1>
+		<h1><?php esc_html_e( 'Top available', 'ubs' ); ?></h1>
 	<?php
 
 	$untappd_settings = get_option( 'ubs_settings' );
@@ -36,9 +55,9 @@ function ubs_render_top_beers_page() {
 		return;
 	}
 
-	$beer_query = new WP_Query(
+	$top_available_beers_query = new WP_Query(
 		array(
-			'posts_per_page'         => 20,
+			'posts_per_page'         => 10,
 			'post_type'              => 'beer',
 			'meta_key'               => 'rating_score',
 			'orderby'                => 'meta_value_num',
@@ -56,28 +75,240 @@ function ubs_render_top_beers_page() {
 	);
 
 	?>
-
+		<h2><?php esc_html_e( 'Top beers', 'ubs' ); ?></h2>
 		<p><?php esc_html_e( 'These beers are available & ranked highest in your favorite Alko store.', 'ubs' ); ?></p>
-		<table class="widefat striped">
-			<thead>
-				<th><?php esc_html_e( 'Beer Name', 'ubs' ); ?></th>
-				<th><?php esc_html_e( 'Rating', 'ubs' ); ?></th>
-				<th><?php esc_html_e( 'ABV%', 'ubs' ); ?></th>
-				<th><?php esc_html_e( 'Availability', 'ubs' ); ?></th>
-			</thead>
-			<tbody>
+		<?php ubs_render_beer_listing( $top_available_beers_query, $untappd_settings['ubs_setting_alko_favorite_store'] ); ?>
+
 	<?php
-	foreach ( $beer_query->posts as $post ) {
-		echo '<tr>';
-		echo '<td><a target="_blank" href="https://www.alko.fi/tuotteet/' . absint( get_post_meta( $post->ID, 'alko_id', true ) ) . '">' . esc_attr( $post->post_excerpt ) . '</a></td>';
-		echo '<td>' . number_format( get_post_meta( $post->ID, 'rating_score', true ), 2 ) . '</td>';
-		echo '<td>' . number_format( get_post_meta( $post->ID, 'beer_abv', true ), 1 ) . '</td>';
-		echo '<td>' . absint( get_post_meta( $post->ID, 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'], true ) ) . '</td>';
-		echo '</tr>';
-	}
+		$top_available_medium_beers_query = new WP_Query(
+			array(
+				'posts_per_page'         => 10,
+				'post_type'              => 'beer',
+				'meta_key'               => 'rating_score',
+				'orderby'                => 'meta_value_num',
+				'order'                  => 'DESC',
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array(
+						'key'     => 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'],
+						'value'   => 0,
+						'compare' => '>',
+					),
+					array(
+						'key'     => 'beer_abv',
+						'value'   => 6,
+						'compare' => '<=',
+						'type'    => 'DECIMAL',
+					),
+				),
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
 	?>
-			</tbody>
-		</table>
+		<h2><?php esc_html_e( 'Top "keskivahva" beers', 'ubs' ); ?></h2>
+		<?php ubs_render_beer_listing( $top_available_medium_beers_query, $untappd_settings['ubs_setting_alko_favorite_store'] ); ?>
+
+		<?php
+		$top_available_sour_beers_query = new WP_Query(
+			array(
+				'posts_per_page'         => 10,
+				'post_type'              => 'beer',
+				'meta_key'               => 'rating_score',
+				'orderby'                => 'meta_value_num',
+				'order'                  => 'DESC',
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array(
+						'key'     => 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'],
+						'value'   => 0,
+						'compare' => '>',
+					),
+					array(
+						'key'     => 'beer_style',
+						'value'   => 'sour',
+						'compare' => 'LIKE',
+					),
+				),
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
+		?>
+		<h2><?php esc_html_e( 'Top sour beers', 'ubs' ); ?></h2>
+		<?php ubs_render_beer_listing( $top_available_sour_beers_query, $untappd_settings['ubs_setting_alko_favorite_store'] ); ?>
+
+		<?php
+		$top_available_nonalc_beers_query = new WP_Query(
+			array(
+				'posts_per_page'         => 10,
+				'post_type'              => 'beer',
+				'meta_key'               => 'rating_score',
+				'orderby'                => 'meta_value_num',
+				'order'                  => 'DESC',
+				'meta_query'             => array(
+					array(
+						'key'     => 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'],
+						'value'   => 0,
+						'compare' => '>',
+					),
+					array(
+						'key'     => 'beer_abv',
+						'value'   => '1',
+						'compare' => '<=',
+						'type'    => 'DECIMAL',
+					),
+				),
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
+		?>
+		<h2><?php esc_html_e( 'Top non-alcoholic beers', 'ubs' ); ?></h2>
+		<?php ubs_render_beer_listing( $top_available_nonalc_beers_query, $untappd_settings['ubs_setting_alko_favorite_store'] ); ?>
+
+		<?php
+		$bottom_available_beers_query = new WP_Query(
+			array(
+				'posts_per_page'         => 5,
+				'post_type'              => 'beer',
+				'meta_key'               => 'rating_score',
+				'orderby'                => 'meta_value_num',
+				'order'                  => 'ASC',
+				'meta_query'             => array(
+					array(
+						'key'     => 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'],
+						'value'   => 0,
+						'compare' => '>',
+					),
+				),
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		?>
+		<h2><?php esc_html_e( 'Worst beers', 'ubs' ); ?></h2>
+		<?php ubs_render_beer_listing( $bottom_available_beers_query, $untappd_settings['ubs_setting_alko_favorite_store'] ); ?>
+
+		<h2><?php esc_html_e( 'Update availability', 'ubs' ); ?></h2>
+		<p><?php esc_html_e( 'You can update availability of all beers in your favorite Alko store. This may take a while.', 'ubs' ); ?></p>
+		<form id="ubs-update-availability" action="" method="post">
+			<?php wp_nonce_field( 'update-availability' ); ?>
+			<button type="submit" id="ubs-update-button" name="ubs-update-button" class="button button-primary"><?php esc_html_e( 'Update availability', 'ubs' ); ?></button>
+			<span class="spinner"></span>
+		</form>
+		<label class="initially-hidden" for="ubs-update-availability-progress"><?php esc_html_e( 'Update progress:', 'ubs' ); ?></label>
+		<progress class="initially-hidden" id="ubs-update-availability-progress" value="0" max="100"></progress>
 	</div>
 	<?php
 }
+
+/**
+ * Render a table listing of beers based on WP_Query results.
+ *
+ * @param  array $beer_query           WP Query.
+ * @param  int   $favorite_alko_store  Favorite Alko store.
+ * @return void
+ */
+function ubs_render_beer_listing( $beer_query, $favorite_alko_store ) {
+	if ( empty( $beer_query->posts ) ) {
+		echo '<p>' . esc_html__( 'No data.', 'ubs' ) . '</p>';
+		return;
+	}
+	?>
+	<table class="widefat striped ubs-availability-table">
+		<thead>
+			<th><?php esc_html_e( 'Beer Name', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Rating', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Style', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'ABV%', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Availability', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Updated', 'ubs' ); ?></th>
+		</thead>
+		<tbody>
+	<?php
+	foreach ( $beer_query->posts as $beer_post ) {
+		echo '<tr>';
+		echo '<td><a target="_blank" href="https://www.alko.fi/tuotteet/' . absint( get_post_meta( $beer_post->ID, 'alko_id', true ) ) . '">' . esc_attr( $beer_post->post_excerpt ) . '</a></td>';
+		echo '<td>' . number_format( get_post_meta( $beer_post->ID, 'rating_score', true ), 2 ) . '</td>';
+		echo '<td>' . esc_attr( get_post_meta( $beer_post->ID, 'beer_style', true ) ) . '</td>';
+		echo '<td>' . number_format( get_post_meta( $beer_post->ID, 'beer_abv', true ), 1 ) . '</td>';
+		echo '<td>' . absint( get_post_meta( $beer_post->ID, 'availability_' . $favorite_alko_store, true ) ) . '</td>';
+		echo '<td>' . esc_attr( date( 'j.n.Y H:i', get_post_meta( $beer_post->ID, 'availability_updated', true ) ) ) . '</td>';
+		echo '</tr>';
+	}
+	?>
+		</tbody>
+	</table>
+	<?php
+
+}
+
+/**
+ * Update Alko store availability in batches with AJAX.
+ *
+ * @return void
+ */
+function ubs_update_availability_ajax() {
+
+	// Verify nonce.
+	if ( isset( $_REQUEST['nonce'] ) ) {
+		wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'], 'update-availability' ) ) );
+	} else {
+		wp_send_json_error( __( 'Permission check failed. Please reload the page and try again.', 'ubs' ), 404 );
+	}
+
+	if ( isset( $_POST['step'] ) ) {
+		$step = absint( $_POST['step'] );
+	} else {
+		exit;
+	}
+
+	// Define the batch size, i.e. how many beers to update per batch.
+	$batch_size = 10;
+
+	// Check how many beers there are stored.
+	$beer_count = wp_count_posts( 'beer' )->publish;
+
+	// Determine how many steps we need to take.
+	$steps_count = ceil( $beer_count / $batch_size );
+
+	// Get beers in batches.
+	$beer_query = new WP_Query(
+		array(
+			'posts_per_page'         => $batch_size,
+			'paged'                  => $step,
+			'post_type'              => 'beer',
+			'meta_key'               => 'rating_score',
+			'orderby'                => 'meta_value_num',
+			'order'                  => 'DESC',
+			'update_post_term_cache' => false,
+			'fields'                 => 'ids',
+		)
+	);
+
+	// For earch beer, update availability.
+	foreach ( $beer_query->posts as $beer_post_id ) {
+		ubs_update_store_availability_for_beer( $beer_post_id );
+	};
+
+	if ( $step < $steps_count ) {
+		$step++;
+		echo wp_json_encode(
+			array(
+				'step'       => $step,
+				'percentage' => number_format( ( ( $step * $batch_size ) / $beer_count ) * 100, 1 ),
+			)
+		);
+	} else {
+		echo wp_json_encode(
+			array(
+				'step'       => 'done',
+				'percentage' => 100,
+			)
+		);
+	}
+	exit;
+}
+add_action( 'wp_ajax_ubs_update_availability_ajax', 'ubs_update_availability_ajax' );
