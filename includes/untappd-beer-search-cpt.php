@@ -364,16 +364,26 @@ function ubs_save_beer( $beer_data, $alko_id = false ) {
 		$post_data['meta_input']['alko_id'] = absint( $alko_id );
 	}
 
+	// Initialize a variable to store the post ID of the newly created/updated post.
+	$beer_post = false;
+
 	// Determine if the beer has been saved before.
 	$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_data['bid'] );
 	if ( false !== $beer_post_id ) {
 		// Set the ID so that the existing post can be updated.
 		$post_data['ID'] = $beer_post_id;
-		return wp_update_post( $post_data );
+		$beer_post       = wp_update_post( $post_data );
 	} else {
 		// Insert a new beer post.
-		return wp_insert_post( $post_data );
+		$beer_post = wp_insert_post( $post_data );
 	}
+
+	// Update beer's Alko availability, if favorite Alko store set.
+	if ( 0 !== $beer_post && false === is_wp_error( $beer_post ) ) {
+		ubs_update_store_availability_for_beer( $beer_post );
+	}
+
+	return $beer_post;
 }
 
 /**

@@ -1,0 +1,16 @@
+.ubs-availability-table,
+#ubs-update-button {
+	margin-bottom: .5em;
+}
+
+.spinner {
+	float: none;
+}
+
+.ubs-update-availability-progress {
+	display: inline-block;
+}
+
+.initially-hidden {
+	display: none;
+}
