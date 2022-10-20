@@ -57,12 +57,12 @@ function ubs_render_top_beers_page() {
 				echo 'nav-tab-active';}
 			?>
 			"><?php esc_html_e( 'Favorite Alko', 'ubs' ); ?></a>
-			<a href="?post_type=beer&page=ubs-top-beers&tab=all_alko" class="nav-tab
+			<a href="?post_type=beer&page=ubs-top-beers&tab=alko_online" class="nav-tab
 			<?php
 			if ( $active_tab ) {
 				echo 'nav-tab-active';}
 			?>
-			"><?php esc_html_e( 'All Alko', 'ubs' ); ?></a>
+			"><?php esc_html_e( 'Alko online', 'ubs' ); ?></a>
 		</nav>
 
 		<div class="tab-content">
@@ -258,7 +258,7 @@ function ubs_render_top_beers_page() {
 
 			<?php
 			break;
-		case 'all_alko':
+		case 'alko_online':
 			$best_alko_beers_query = new WP_Query(
 				array(
 					'posts_per_page'         => 10,
@@ -266,13 +266,20 @@ function ubs_render_top_beers_page() {
 					'meta_key'               => 'rating_score',
 					'orderby'                => 'meta_value_num',
 					'order'                  => 'DESC',
+					'meta_query'             => array(
+						array(
+							'key'     => 'availability_online',
+							'value'   => 0,
+							'compare' => '>',
+						),
+					),
 					'no_found_rows'          => true,
 					'update_post_term_cache' => false,
 				)
 			);
 			?>
-			<h2><?php esc_html_e( 'Best beers in Alko', 'ubs' ); ?></h2>
-			<?php ubs_render_beer_listing( $best_alko_beers_query ); ?>
+			<h2><?php esc_html_e( 'Top rated beers available online at Alko', 'ubs' ); ?></h2>
+			<?php ubs_render_beer_listing( $best_alko_beers_query, 'online' ); ?>
 			<?php
 			break;
 		endswitch;
@@ -347,7 +354,7 @@ function ubs_update_availability_ajax() {
 	}
 
 	// Define the batch size, i.e. how many beers to update per batch.
-	$batch_size = 10;
+	$batch_size = 5;
 
 	// Check how many beers there are stored.
 	$beer_count = wp_count_posts( 'beer' )->publish;

@@ -152,9 +152,10 @@ function ubs_set_custom_beer_columns( $columns ) {
 
 	// Don't add the column if favorite store has not been defined.
 	if ( false !== $favorite_alko_store ) {
-		$columns['availability'] = __( 'Availability', 'ubs' );
+		$columns['availability_alko_store'] = __( 'Favorite Alko', 'ubs' );
 	}
 
+	$columns['availability_alko_online'] = __( 'Alko online', 'ubs' );
 	$columns['rating'] = __( 'Rating', 'ubs' );
 
 	return $columns;
@@ -193,7 +194,7 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 				esc_html_e( 'N/A', 'ubs' );
 			}
 			break;
-		case 'availability':
+		case 'availability_alko_store':
 			$favorite_alko_store = ubs_get_favorite_alko_store();
 
 			// Don't add the action if favorite store has not been defined.
@@ -207,6 +208,15 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 				} else {
 					echo absint( $amount );
 				}
+			}
+			break;
+		case 'availability_alko_online':
+			$amount = get_post_meta( $post_id, 'availability_online', true );
+
+			if ( empty( $amount ) && '0' !== $amount ) {
+				esc_html_e( 'N/A', 'ubs' );
+			} else {
+				echo absint( $amount );
 			}
 			break;
 	}
@@ -550,7 +560,7 @@ function ubs_add_update_store_availability_action( $actions, $post ) {
 add_filter( 'post_row_actions', 'ubs_add_update_store_availability_action', 10, 2 );
 
 /**
- * Re-fetch beer info from Untappd.
+ * Update availability of the product in favorite Alko store.
  *
  * @param  int $post_id Post ID.
  * @return void
@@ -561,7 +571,8 @@ function ubs_update_store_availability_for_beer( $post_id ) {
 	$alko_id = get_post_meta( $post_id, 'alko_id', true );
 
 	// Get beer info from Untappd.
-	$alko_availability = ubs_update_alko_availability( $alko_id, $post_id );
+	$alko_availability   = ubs_update_alko_availability( $alko_id, $post_id );
+	$online_availability = ubs_update_alko_online_availability( $alko_id, $post_id );
 }
 
 /**
