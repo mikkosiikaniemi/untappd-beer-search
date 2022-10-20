@@ -5,6 +5,7 @@ jQuery(document).ready(function ($) {
 
 		$("#ubs-search .spinner").addClass("is-active");
 		$("#ubs-search [type=submit]").attr("disabled", true);
+		$("#ubs-alko-populate").attr("disabled", true);
 
 		var beer_name = $('#beer-name').val();
 		var options = $("#beer-names option");
@@ -32,6 +33,7 @@ jQuery(document).ready(function ($) {
 			$('#ubs-untappd-response').html(response);
 			$("#ubs-search .spinner").removeClass("is-active");
 			$("#ubs-search [type=submit]").attr("disabled", false);
+			$("#ubs-alko-populate").attr("disabled", false);
 		});
 
 		return false;
@@ -92,6 +94,7 @@ jQuery(document).ready(function ($) {
 
 		$("#ubs-search .spinner").addClass("is-active");
 		$("#ubs-alko-populate").attr("disabled", true);
+		$("#ubs-search [type=submit]").attr("disabled", true);
 
 		var data = {
 			action: 'ubs_populate_alko_product',
@@ -101,8 +104,6 @@ jQuery(document).ready(function ($) {
 		$.post(ajaxurl, data, function (response) {
 			$('#beer-name').val(response);
 			$('#ubs-search').submit();
-			$("#ubs-search .spinner").removeClass("is-active");
-			$("#ubs-alko-populate").attr("disabled", false);
 		});
 
 		return false;
