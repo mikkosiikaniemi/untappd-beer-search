@@ -92,8 +92,7 @@ function ubs_get_beer_info( $beer_id ) {
  */
 function ubs_update_alko_availability( $alko_id, $post_id ) {
 
-	$untappd_settings    = get_option( 'ubs_settings' );
-	$favorite_alko_store = absint( $untappd_settings['ubs_setting_alko_favorite_store'] );
+	$favorite_alko_store = ubs_get_favorite_alko_store();
 
 	$alko_store_product_availability_url = 'https://www.alko.fi/INTERSHOP/web/WFS/Alko-OnlineShop-Site/fi_FI/-/EUR/ALKO_ViewStore-Stock?SKU=' . $alko_id . '&StoreID=' . $favorite_alko_store;
 
@@ -117,5 +116,5 @@ function ubs_update_alko_availability( $alko_id, $post_id ) {
 	}
 
 	update_post_meta( $post_id, 'availability_' . $favorite_alko_store, $amount );
-	update_post_meta( $post_id, 'availability_updated', current_time( 'timestamp' ) );
+	update_post_meta( $post_id, 'availability_updated_' . $favorite_alko_store, current_time( 'timestamp' ) );
 }

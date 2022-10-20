@@ -87,3 +87,18 @@ function ubs_search_alko_catalog_for_name( $beer_name_to_search ) {
 
 	return $return_results;
 }
+
+/**
+ * Get favorite Alko store ID, if set.
+ *
+ * @return false|int Favorite Alko store ID, if set. Otherwise false.
+ */
+function ubs_get_favorite_alko_store() {
+	$untappd_settings = get_option( 'ubs_settings' );
+
+	if ( empty( $untappd_settings['ubs_setting_alko_favorite_store'] ) ) {
+		return false;
+	} else {
+		return absint( $untappd_settings['ubs_setting_alko_favorite_store'] );
+	}
+}
