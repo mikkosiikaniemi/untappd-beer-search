@@ -115,7 +115,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	$html .= '<p>';
 	if ( false !== $alko_id ) {
 		// translators: Alko product number.
-		$html .= sprintf( __( 'Alko product number <kbd>%1$d</kbd> (<a target="_blank" href="https://www.alko.fi/tuotteet/%1$d">Alko product link<span class="dashicons dashicons-external"></span></a>) will be associated with the selected beer.', 'ubs' ), $alko_id );
+		$html .= sprintf( __( 'Alko product number <kbd>%1$s</kbd> (<a target="_blank" href="https://www.alko.fi/tuotteet/%1$s">Alko product link<span class="dashicons dashicons-external"></span></a>) will be associated with the selected beer.', 'ubs' ), str_pad( $alko_id, 6, '0', STR_PAD_LEFT ) );
 		$html .= '<input type="hidden" id="alko_id" name="alko_id" value="' . $alko_id . '" />';
 	} else {
 		$html .= '<label for="alko_id">';

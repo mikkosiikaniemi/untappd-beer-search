@@ -148,10 +148,10 @@ function ubs_set_custom_beer_columns( $columns ) {
 	$columns['link'] = __( 'Links', 'ubs' );
 	$columns['abv']  = __( 'ABV%', 'ubs' );
 
-	$untappd_settings = get_option( 'ubs_settings' );
+	$favorite_alko_store = ubs_get_favorite_alko_store();
 
 	// Don't add the column if favorite store has not been defined.
-	if ( false === empty( $untappd_settings['ubs_setting_alko_favorite_store'] ) ) {
+	if ( false !== $favorite_alko_store ) {
 		$columns['availability'] = __( 'Availability', 'ubs' );
 	}
 
@@ -187,21 +187,20 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 			esc_html_e( 'Alko' );
 			echo ' ';
 			if ( false === empty( $alko_id ) ) {
-				echo '<a target="_blank" href="https://www.alko.fi/tuotteet/' . absint( $alko_id ) . '">' . absint( $alko_id ) . ' <span class="dashicons dashicons-external"></span></a>';
+				$padded_alko_id = str_pad( $alko_id, 6, '0', STR_PAD_LEFT );
+				echo '<a target="_blank" href="https://www.alko.fi/tuotteet/' . esc_attr( $padded_alko_id ) . '">' . esc_attr( $padded_alko_id ) . ' <span class="dashicons dashicons-external"></span></a>';
 			} else {
 				esc_html_e( 'N/A', 'ubs' );
 			}
 			break;
 		case 'availability':
-			$untappd_settings = get_option( 'ubs_settings' );
-
-			$favorite_store_empty = empty( $untappd_settings['ubs_setting_alko_favorite_store'] );
+			$favorite_alko_store = ubs_get_favorite_alko_store();
 
 			// Don't add the action if favorite store has not been defined.
-			if ( true === $favorite_store_empty ) {
+			if ( false === $favorite_alko_store ) {
 				esc_html_e( 'N/A', 'ubs' );
 			} else {
-				$amount = get_post_meta( $post_id, 'availability_' . $untappd_settings['ubs_setting_alko_favorite_store'], true );
+				$amount = get_post_meta( $post_id, 'availability_' . $favorite_alko_store, true );
 
 				if ( empty( $amount ) && '0' !== $amount ) {
 					esc_html_e( 'N/A', 'ubs' );
@@ -529,10 +528,10 @@ function ubs_add_update_store_availability_action( $actions, $post ) {
 	// Check that we're on beer post type.
 	if ( 'beer' === $post->post_type ) {
 
-		$untappd_settings = get_option( 'ubs_settings' );
+		$favorite_alko_store = ubs_get_favorite_alko_store();
 
 		// Don't add the action if favorite store has not been defined.
-		if ( false === isset( $untappd_settings['ubs_setting_alko_favorite_store'] ) || empty( $untappd_settings['ubs_setting_alko_favorite_store'] ) ) {
+		if ( false === $favorite_alko_store ) {
 			return $actions;
 		}
 
