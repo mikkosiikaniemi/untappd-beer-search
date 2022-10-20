@@ -102,7 +102,7 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 					}
 				}
 
-				$beers[ $row[0] ] = $brewery . ' ' . $beer_name;
+				$beers[ $row[0] ] = $beer_name;
 			}
 		}
 
