@@ -49,7 +49,6 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 			'viinipussi',
 			'hanapakkaus',
 			'muovipullo',
-			'tynnyri',
 		);
 
 		// Skip products containing certain suffix (mainly multipacks).
@@ -59,6 +58,7 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 			'12-pack',
 			'18-pack',
 			'24-pack',
+			'tynnyri',
 		);
 
 		foreach ( $alko_prices_data->rows() as $row_index => $row ) {
