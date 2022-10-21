@@ -278,8 +278,38 @@ function ubs_render_top_beers_page() {
 				)
 			);
 			?>
-			<h2><?php esc_html_e( 'Top rated beers available online at Alko', 'ubs' ); ?></h2>
+			<h2><?php esc_html_e( 'Top rated beers', 'ubs' ); ?></h2>
 			<?php ubs_render_beer_listing( $best_alko_beers_query, 'online' ); ?>
+
+			<?php
+			$best_nonalko_beers_query = new WP_Query(
+				array(
+					'posts_per_page'         => 15,
+					'post_type'              => 'beer',
+					'meta_key'               => 'rating_score',
+					'orderby'                => 'meta_value_num',
+					'order'                  => 'DESC',
+					'meta_query'             => array(
+						array(
+							'key'     => 'availability_online',
+							'value'   => 0,
+							'compare' => '>',
+						),
+						array(
+							'key'     => 'beer_abv',
+							'value'   => '1',
+							'compare' => '<=',
+							'type'    => 'DECIMAL',
+						),
+					),
+					'no_found_rows'          => true,
+					'update_post_term_cache' => false,
+				)
+			);
+			?>
+			<h2><?php esc_html_e( 'Top rated non-alcoholic beers', 'ubs' ); ?></h2>
+			<?php ubs_render_beer_listing( $best_nonalko_beers_query, 'online' ); ?>
+
 			<?php
 			break;
 		endswitch;
