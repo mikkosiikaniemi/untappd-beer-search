@@ -261,7 +261,7 @@ function ubs_render_top_beers_page() {
 		case 'alko_online':
 			$best_alko_beers_query = new WP_Query(
 				array(
-					'posts_per_page'         => 10,
+					'posts_per_page'         => 15,
 					'post_type'              => 'beer',
 					'meta_key'               => 'rating_score',
 					'orderby'                => 'meta_value_num',
