@@ -1,0 +1,23 @@
+{
+  "name": "untappd-beer-search",
+  "version": "1.0.0",
+  "description": "A WordPress plugin for searching [Untappd](https://untappd.com) for beer info via [Untappd API](https://untappd.com/api/), and saving the information into a WordPress custom post type.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "tablesorter": "^2.31.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikkosiikaniemi/untappd-beer-search.git"
+  },
+  "author": "Mikko Siikaniemi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikkosiikaniemi/untappd-beer-search/issues"
+  },
+  "homepage": "https://github.com/mikkosiikaniemi/untappd-beer-search#readme"
+}

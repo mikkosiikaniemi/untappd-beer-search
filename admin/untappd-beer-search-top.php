@@ -31,7 +31,10 @@ function ubs_enqueue_update_availability_scripts( $hook ) {
 		return;
 	}
 	wp_enqueue_script( 'ubs-update-availability', plugin_dir_url( __FILE__ ) . '/js/untappd-beer-update-availability.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . 'js/untappd-beer-update-availability.js' ), true );
+	wp_register_script( 'ubs-jquery-tablesorter', plugin_dir_url( __FILE__ ) . '/js/untappd-beer-search-tablesorter.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . 'js/untappd-beer-search-tablesorter.js' ), true );
+	wp_enqueue_script( 'jquery-tablesorter', plugin_dir_url( __DIR__ ) . '/node_modules/tablesorter/dist/js/jquery.tablesorter.min.js', array( 'jquery', 'ubs-jquery-tablesorter' ), filemtime( plugin_dir_path( __DIR__ ) . 'node_modules/tablesorter/dist/js/jquery.tablesorter.min.js' ), true );
 	wp_enqueue_style( 'ubs-update-styles', plugin_dir_url( __FILE__ ) . '/css/untappd-beer-update-availability.css', array(), filemtime( plugin_dir_path( __FILE__ ) . 'css/untappd-beer-update-availability.css' ) );
+	wp_enqueue_style( 'ubs-tablesorter', plugin_dir_url( __FILE__ ) . '/css/untappd-beer-search-tablesorter.css', array(), filemtime( plugin_dir_path( __FILE__ ) . 'css/untappd-beer-search-tablesorter.css' ) );
 }
 add_action( 'admin_enqueue_scripts', 'ubs_enqueue_update_availability_scripts' );
 
@@ -332,7 +335,7 @@ function ubs_render_beer_listing( $beer_query, $favorite_alko_store = false ) {
 		return;
 	}
 	?>
-	<table class="widefat striped ubs-availability-table">
+	<table class="widefat striped ubs-availability-table tablesorter">
 		<thead>
 			<th><?php esc_html_e( 'Beer Name', 'ubs' ); ?></th>
 			<th><?php esc_html_e( 'Rating', 'ubs' ); ?></th>
@@ -340,7 +343,7 @@ function ubs_render_beer_listing( $beer_query, $favorite_alko_store = false ) {
 			<th><?php esc_html_e( 'ABV%', 'ubs' ); ?></th>
 		<?php if ( false !== $favorite_alko_store ) : ?>
 			<th><?php esc_html_e( 'Availability', 'ubs' ); ?></th>
-			<th><?php esc_html_e( 'Updated', 'ubs' ); ?></th>
+			<th  class="sorter-shortDate" data-date-format="ddmmyyyy"><?php esc_html_e( 'Updated', 'ubs' ); ?></th>
 			<?php endif; ?>
 		</thead>
 		<tbody>
