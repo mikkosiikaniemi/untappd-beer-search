@@ -40,7 +40,7 @@ jQuery(document).ready(function ($) {
 	});
 
 	// Process save form submit action.
-	$(document).on('submit', '#ubs-search-results', function (e) {
+	$(document).on('submit', '#ubs-search-results', function (element) {
 
 		$("#ubs-search-results .spinner").addClass("is-active");
 		$("#ubs-search-results [type=submit]").attr("disabled", true);
@@ -52,7 +52,7 @@ jQuery(document).ready(function ($) {
 			ubs_nonce: $('#ubs_save_nonce').val(),
 		};
 
-		$('input[name="beer-id[]"]:checked').each(function (e) {
+		$('input[name="beer-id[]"]:checked').each(function (element) {
 			id = $(this).attr("id");
 			id = id.replace('beer-check-', '');
 			$('#beer-save-' + id).html('<span class="spinner is-active"></span>');
@@ -64,7 +64,7 @@ jQuery(document).ready(function ($) {
 			$.each(results, function (beer_id, status) {
 				if ($.isNumeric(status)) {
 					$('#beer-check-' + beer_id).prop("checked", true).attr("disabled", true);
-					$('#beer-save-' + beer_id).html('☑️ ' + ' Rating: ' + Number(status).toFixed(2) );
+					$('#beer-save-' + beer_id).html('☑️ ' + ' Rating: ' + Number(status).toFixed(2));
 				} else {
 					$('#beer-save-' + beer_id).html(status);
 				}
@@ -107,5 +107,31 @@ jQuery(document).ready(function ($) {
 		});
 
 		return false;
+	});
+
+	// Remove suffixes from beer name in search input.
+	$(document).on('click', '#ubs-search-remove-suffixes', function (element) {
+		element.preventDefault();
+
+		var beer_name = $('#beer-name').val().trim();
+
+		// Remove vintage from name.
+		if ($.isNumeric(beer_name.substring(beer_name.length - 4))) {
+			beer_name = beer_name.substring(0, beer_name.length - 4);
+			beer_name = beer_name.trim();
+		}
+
+		// Remove suffixes.
+		var suffixes = ["DDH", "DIPA", "IPA", "New England", "Imperial Stout", "Berliner Weisse", "India Pale Ale"];
+		for (var i = 0; i < suffixes.length; i++) {
+			suffixes.forEach(function (suffix) {
+				if (beer_name.substring(beer_name.length - suffix.length) == suffix) {
+					beer_name = beer_name.substring(0, beer_name.length - suffix.length);
+					beer_name = beer_name.trim();
+				}
+			});
+		}
+		$('#beer-name').val(beer_name);
+		$('#ubs-search').submit();
 	});
 });

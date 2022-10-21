@@ -49,7 +49,7 @@ function ubs_render_search_page() {
 		<p>
 			<?php
 			// translators: number of beers in Alko catalog not yet saved.
-			echo wp_kses_post( sprintf( __( 'There are %d beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', 'ubs' ), ( count( get_option( 'ubs_beers', true ) ) - wp_count_posts( 'beer' )->publish ) ) );
+			echo wp_kses_post( sprintf( __( 'There are <kbd>%d</kbd> beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', 'ubs' ), ( count( get_option( 'ubs_beers', true ) ) - wp_count_posts( 'beer' )->publish ) ) );
 			?>
 		</p>
 		<form id="ubs-search" action="" method="post">
@@ -98,8 +98,11 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 		$html = '<p>';
 		// translators: amount of search results.
 		$html .= __( 'No beers found.', 'ubs' );
+		$html .= '</p><p>';
+		$html .= __( 'Sometimes trimming vintages or suffixes like IPA or DDH from beer name may help.', 'ubs' );
 		$html .= '</p>';
-		$html .= '<p>Hourly API requests limit remaining: ' . $result_array['limit_remaining'] . '</p>';
+		$html .= '<button class="button button-secondary" id="ubs-search-remove-suffixes">' . __( 'Trim & search again', 'ubs' ) . '</button>';
+		$html .= '<p>Hourly API requests limit remaining: <kbd>' . $result_array['limit_remaining'] . '</kbd></p>';
 		return $html;
 	}
 
@@ -239,7 +242,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	$html .= '<span class="spinner"></span>';
 	$html .= '</form>';
 
-	$html .= '<p>Hourly API requests limit remaining: ' . $result_array['limit_remaining'] . '</p>';
+	$html .= '<p>Hourly API requests limit remaining: <kbd>' . $result_array['limit_remaining'] . '</kbd></p>';
 
 	return $html;
 }
