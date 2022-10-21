@@ -61,13 +61,14 @@ jQuery(document).ready(function ($) {
 		$.post(ajaxurl, data, function (response) {
 
 			var results = $.parseJSON(response);
-			$.each(results, function (beer_id, status) {
-				if ($.isNumeric(status)) {
+			$.each(results, function (beer_id, beer_data) {
+				if ($.isNumeric(beer_data.status)) {
 					$('#beer-check-' + beer_id).prop("checked", true).attr("disabled", true);
-					$('#beer-save-' + beer_id).html('☑️ ' + ' Rating: ' + Number(status).toFixed(2));
+					$('#beer-save-' + beer_id).html('☑️ ' + ' Rating: ' + Number(beer_data.status).toFixed(2));
 				} else {
-					$('#beer-save-' + beer_id).html(status);
+					$('#beer-save-' + beer_id).html(beer_data.status);
 				}
+				$("#ubs-limit-remaining").html(beer_data.limit_remaining);
 			});
 
 			$("#ubs-search-results .spinner").removeClass("is-active");
@@ -122,7 +123,7 @@ jQuery(document).ready(function ($) {
 		}
 
 		// Remove suffixes.
-		var suffixes = ["DDH", "DIPA", "IPA", "New England", "Imperial Stout", "Berliner Weisse", "India Pale Ale"];
+		var suffixes = ["DDH", "DIPA", "NEIPA", "IPA", "New England", "Imperial Stout", "Berliner Weisse", "India Pale Ale", "Barley Wine", "Gose"];
 		for (var i = 0; i < suffixes.length; i++) {
 			suffixes.forEach(function (suffix) {
 				if (beer_name.substring(beer_name.length - suffix.length) == suffix) {

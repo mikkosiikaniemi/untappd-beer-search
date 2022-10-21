@@ -242,7 +242,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	$html .= '<span class="spinner"></span>';
 	$html .= '</form>';
 
-	$html .= '<p>Hourly API requests limit remaining: <kbd>' . $result_array['limit_remaining'] . '</kbd></p>';
+	$html .= '<p>Hourly API requests limit remaining: <kbd><span id="ubs-limit-remaining">' . $result_array['limit_remaining'] . '</span></kbd></p>';
 
 	return $html;
 }
@@ -277,7 +277,10 @@ function ubs_preprocess_beer_for_saving( $beer_id, $alko_id ) {
 			$status = get_post_meta( $saved_beer, 'rating_score', true );
 		}
 	}
-	$return_results[ $beer_id ] = $status;
+	$return_results[ $beer_id ] = array(
+		'status'          => $status,
+		'limit_remaining' => $beer_info['limit_remaining'],
+	);
 
 	return $return_results;
 }
