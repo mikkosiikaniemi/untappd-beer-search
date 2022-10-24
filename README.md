@@ -34,10 +34,14 @@ sequenceDiagram
 - [x] Ability to re-fetch beer info to update an existing beer 
 - [x] Taxonomies for beer type, ABV, country, brewery etc.
 - [x] Browser extension to show ratings on Alko website.
-- [ ] Sort admin listing by rating, ABV, etc.
-- [ ] Beer filter by type, ABV, brewery etc.
+- [x] Sort admin listing by rating
 - [ ] Front-end UI, not only on admin side?
+- [ ] Beer filter by type, ABV, brewery etc.
 - [ ] Search for multiple beers at once (textarea input instead of text)
 - [ ] Replace jQuery with native JavaScript
-- [ ] Process the whole Alko catalog in batches, trying to match beers as automatically as possible, skipping already imported beers 
-- [ ] Remove duplicates from Alko product list (mainly due to same product being sold in different size bottles)
+- [x] Process the whole Alko catalog in batches, ~~trying to match beers as automatically as possible, skipping already imported beers~~
+- [ ] ~~Remove duplicates from Alko product list (mainly due to same product being sold in different size bottles)~~
+- [x] Ability to set favorite Alko store
+- [x] Ability to update product availability in favorite Alko store and in alko.fi online webstore
+- [x] Top rated beers view (separately for favorite Alko store and online store)
+- [x] Ability to associate multiple Alko product numbers per saved beer (same product sold in different size bottles)
