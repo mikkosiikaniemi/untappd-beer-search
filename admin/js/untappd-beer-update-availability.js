@@ -29,17 +29,14 @@ jQuery(document).ready(function ($) {
 			},
 			dataType: "json",
 			success: function( response ) {
-				if ('done' == response.step) {
-					console.log(response.percentage);
+				if ('done' === response.step) {
+					$('#ubs-update-progess').html( response.beer_count );
 					$('#ubs-update-availability-progress').attr( 'value', response.percentage );
 					$('.spinner').removeClass('is-active');
 					$('#ubs-update-availability').attr('disabled', false);
-					console.log('Done');
-
 				} else {
-					console.log(response.percentage);
+					$('#ubs-update-progess').html( response.step * response.batch_size );
 					$('#ubs-update-availability-progress').attr( 'value', response.percentage );
-
 					process_step( parseInt( response.step ), self, nonce );
 				}
 

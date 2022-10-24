@@ -256,7 +256,7 @@ function ubs_render_top_beers_page() {
 				<button type="submit" id="ubs-update-button" name="ubs-update-button" class="button button-primary"><?php esc_html_e( 'Update availability', 'ubs' ); ?></button>
 				<span class="spinner"></span>
 			</form>
-			<label class="initially-hidden" for="ubs-update-availability-progress"><?php esc_html_e( 'Update progress:', 'ubs' ); ?></label>
+			<label class="initially-hidden" for="ubs-update-availability-progress"><?php esc_html_e( 'Update progress:', 'ubs' ); ?> <span id="ubs-update-progess">0</span>/<?php echo absint( wp_count_posts( 'beer' )->publish ); ?></label>
 			<progress class="initially-hidden" id="ubs-update-availability-progress" value="0" max="100"></progress>
 
 			<?php
@@ -423,6 +423,7 @@ function ubs_update_availability_ajax() {
 		echo wp_json_encode(
 			array(
 				'step'       => $step,
+				'batch_size' => $batch_size,
 				'percentage' => number_format( ( ( $step * $batch_size ) / $beer_count ) * 100, 1 ),
 			)
 		);
@@ -430,6 +431,8 @@ function ubs_update_availability_ajax() {
 		echo wp_json_encode(
 			array(
 				'step'       => 'done',
+				'batch_size' => $batch_size,
+				'beer_count' => $beer_count,
 				'percentage' => 100,
 			)
 		);
