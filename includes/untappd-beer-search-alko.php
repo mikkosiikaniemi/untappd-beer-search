@@ -102,15 +102,12 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 					}
 				}
 
-				$beers[ $row[0] ] = $beer_name;
+				$beers[ absint( $row[0] ) ] = $beer_name;
 			}
 		}
 
-		// Remove duplicates.
-		$unique_beers = array_unique( $beers );
-
-		update_option( 'ubs_beers', $unique_beers, false );
-
+		// Save Alko catalog to 'wp_options' table.
+		update_option( 'ubs_beers', $beers, false );
 	} else {
 		wp_die( esc_html( $alko_prices_data->error() ) );
 	}
