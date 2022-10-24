@@ -1,7 +1,9 @@
-jQuery(document).ready(function ($) {
+jQuery(function($) {
 
 	// Process search form submit action.
-	$('#ubs-search').submit(function () {
+	$('#ubs-search').on( 'submit', function ( event, alko_id ) {
+
+		var populate_button_orig_state = $("#ubs-alko-populate").attr("disabled");
 
 		$("#ubs-search .spinner").addClass("is-active");
 		$("#ubs-search [type=submit]").attr("disabled", true);
@@ -9,16 +11,17 @@ jQuery(document).ready(function ($) {
 
 		var beer_name = $('#beer-name').val();
 		var options = $("#beer-names option");
-		var alko_id = null;
 
-		// Loop thorugh the datalist options to find out the selected option.
-		// Get the data attribute to find out Alko product ID.
-		for (var i = 0; i < options.length; i++) {
-			var option = options[i];
+		if (alko_id === null) {
+			// Loop thorugh the datalist options to find out the selected option.
+			// Get the data attribute to find out Alko product ID.
+			for (var i = 0; i < options.length; i++) {
+				var option = options[i];
 
-			if (option.innerText === beer_name) {
-				alko_id = option.getAttribute('data-alko-id');
-				break;
+				if (option.innerText === beer_name) {
+					alko_id = option.getAttribute('data-alko-id');
+					break;
+				}
 			}
 		}
 
@@ -33,7 +36,7 @@ jQuery(document).ready(function ($) {
 			$('#ubs-untappd-response').html(response);
 			$("#ubs-search .spinner").removeClass("is-active");
 			$("#ubs-search [type=submit]").attr("disabled", false);
-			$("#ubs-alko-populate").attr("disabled", false);
+			$("#ubs-alko-populate").attr("disabled", populate_button_orig_state);
 		});
 
 		return false;
@@ -77,18 +80,6 @@ jQuery(document).ready(function ($) {
 		return false;
 	});
 
-	// Check all checkboxes on search results.
-	$(document).on('click', '#ubs-select-all', function (element) {
-		element.preventDefault();
-		$('input[name="beer-id[]"]').prop("checked", true);
-	});
-
-	// Clear all checkboxes on search results.
-	$(document).on('click', '#ubs-select-none', function (element) {
-		element.preventDefault();
-		$('input[name="beer-id[]"]').prop("checked", false);
-	});
-
 	// Populate search field with first Alko product not yet saved.
 	$(document).on('click', '#ubs-alko-populate', function (element) {
 		element.preventDefault();
@@ -103,8 +94,12 @@ jQuery(document).ready(function ($) {
 		};
 
 		$.post(ajaxurl, data, function (response) {
-			$('#beer-name').val(response);
-			$('#ubs-search').submit();
+			if (response.success === true) {
+				$('#ubs-beers-left-to-save').html(response.data.beers_left_to_save);
+				$('#beer-name').val(response.data.beer_name);
+			}
+
+			$('#ubs-search').trigger( 'submit', [ response.data.alko_id ] );
 		});
 
 		return false;
@@ -134,5 +129,27 @@ jQuery(document).ready(function ($) {
 		}
 		$('#beer-name').val(beer_name);
 		$('#ubs-search').submit();
+	});
+
+	// Associate another Alko product number with an existing saved beer.
+	$(document).on('click', '.ubs-associate-alko', function (element) {
+		element.preventDefault();
+
+		var associate_button = $(this);
+
+		associate_button.attr("disabled", true);
+
+		var data = {
+			action: 'ubs_associate_additional_alko_id',
+			original_alko_id: $(this).data('post-id'),
+			additional_alko_id: $('#alko_id').val(),
+			ubs_nonce: $('#ubs_search_nonce').val(),
+		};
+
+		$.post(ajaxurl, data, function (response) {
+			associate_button.html('✓');
+		});
+
+		return false;
 	});
 });
