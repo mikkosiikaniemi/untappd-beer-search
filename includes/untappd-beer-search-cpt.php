@@ -156,7 +156,7 @@ function ubs_set_custom_beer_columns( $columns ) {
 	}
 
 	$columns['availability_alko_online'] = __( 'Alko online', 'ubs' );
-	$columns['rating'] = __( 'Rating', 'ubs' );
+	$columns['rating']                   = __( 'Rating', 'ubs' );
 
 	return $columns;
 }
@@ -206,7 +206,8 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 				if ( empty( $amount ) && '0' !== $amount ) {
 					esc_html_e( 'N/A', 'ubs' );
 				} else {
-					echo absint( $amount );
+					echo '<kbd>' . absint( $amount ) . '</kbd>';
+					echo ' <small>(' . esc_attr( date( 'j.n.Y H:i', get_post_meta( $post_id, 'availability_updated_' . $favorite_alko_store, true ) ) ) . ')</small>';
 				}
 			}
 			break;
@@ -216,7 +217,8 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 			if ( empty( $amount ) && '0' !== $amount ) {
 				esc_html_e( 'N/A', 'ubs' );
 			} else {
-				echo absint( $amount );
+				echo '<kbd>' . absint( $amount ) . '</kbd>';
+				echo ' <small>(' . esc_attr( date( 'j.n.Y H:i', get_post_meta( $post_id, 'availability_updated_online', true ) ) ) . ')</small>';
 			}
 			break;
 	}
