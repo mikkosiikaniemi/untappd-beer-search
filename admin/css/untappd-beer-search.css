@@ -18,6 +18,11 @@ select#alko_id {
 	margin-top: 1em;
 }
 
+#ubs-search {
+	display: flex;
+	gap: .3em;
+}
+
 .ubs-search-results {
 	margin-bottom: .5em;
 }
@@ -33,4 +38,14 @@ td[id^="beer-save"] .spinner {
 	width: 1em;
 	background-size: 1em;
 	margin: 0;
+}
+
+#ubs-search-results button + button {
+	margin-left: .3em;
+}
+
+button.ubs-associate-alko.ubs-associate-alko {
+	min-width: 6em;
+	vertical-align: baseline;
+	margin-left: .5em;
 }
