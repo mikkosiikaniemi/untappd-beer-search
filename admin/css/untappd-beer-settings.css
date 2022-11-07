@@ -1,0 +1,15 @@
+.spinner {
+	float: none;
+}
+
+#ubs-price-sheet-message {
+	display: inline-block;
+}
+
+button + .spinner {
+	margin-top: 0;
+}
+
+p.ubs-fetch-wrapper.ubs-fetch-wrapper {
+	margin-top: .75rem;
+}

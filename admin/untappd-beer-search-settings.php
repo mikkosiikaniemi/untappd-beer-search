@@ -60,7 +60,7 @@ function ubs_initialize_settings() {
 
 	add_settings_field(
 		'ubs_setting_alko_price_sheet',
-		__( 'Alko price sheet', 'ubs' ),
+		__( 'Alko price sheet URL', 'ubs' ),
 		'ubs_setting_alko_price_sheet',
 		'ubs_settings',
 		'ubs_settings_section_alko'
@@ -96,7 +96,7 @@ function ubs_setting_client_id() {
 function ubs_setting_client_secret() {
 	$options = get_option( 'ubs_settings' );
 	?>
-	<input type="password" size="46" name="ubs_settings[ubs_setting_client_secret]" value="<?php echo isset( $options['ubs_setting_client_secret'] ) ? esc_attr( $options['ubs_setting_client_secret'] ) : ''; ?>" />
+	<input type="text" size="46" name="ubs_settings[ubs_setting_client_secret]" value="<?php echo isset( $options['ubs_setting_client_secret'] ) ? esc_attr( $options['ubs_setting_client_secret'] ) : ''; ?>" />
 	<?php
 }
 
@@ -108,39 +108,30 @@ function ubs_setting_client_secret() {
 function ubs_setting_alko_price_sheet() {
 	$options = get_option( 'ubs_settings' );
 
-	$xlsx_attachments = new WP_Query(
-		array(
-			'post_type'              => 'attachment',
-			'post_status'            => 'inherit',
-			'post_mime_type'         => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-		)
-	);
-
+	if ( is_array( $options ) && false === empty( $options['ubs_setting_alko_price_sheet'] ) ) {
+		$alko_price_sheet_url = $options['ubs_setting_alko_price_sheet'];
+	} else {
+		$alko_price_sheet_url = 'https://www.alko.fi/INTERSHOP/static/WFS/Alko-OnlineShop-Site/-/Alko-OnlineShop/fi_FI/Alkon%20Hinnasto%20Tekstitiedostona/alkon-hinnasto-tekstitiedostona.xlsx';
+	}
 	?>
-
-<select name="ubs_settings[ubs_setting_alko_price_sheet]">
-	<?php if ( $xlsx_attachments->have_posts() ) : ?>
-		<option value=""><?php esc_html_e( 'Please select a sheet...', 'ubs' ); ?></option>
-		<?php
-		foreach ( $xlsx_attachments->posts as $attachment ) {
-			echo '<option value="' . absint( $attachment->ID ) . '"';
-			if ( absint( $options['ubs_setting_alko_price_sheet'] ) === $attachment->ID ) {
-				echo ' selected';
-			}
-			echo '>';
-			echo esc_attr( basename( $attachment->guid ) );
-			echo ' (' . esc_attr( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $attachment->post_date_gmt ) ) ) . ')';
-			echo '</option>';
-		};
-		?>
-		<?php else : ?>
-			<option value=""><?php esc_html_e( 'Upload price sheet to Media Library first.', 'ubs' ); ?></option>
-			<?php endif; ?>
-	</select>
+	<input type="url" name="ubs_settings[ubs_setting_alko_price_sheet]" size="46" value="<?php echo esc_url( $alko_price_sheet_url ); ?>" />
+	<p class="description ubs-settings-description"><?php esc_html_e( 'Enter Alko price sheet URL. The default location is pre-filled.', 'ubs' ); ?></p>
+	<p class="ubs-fetch-wrapper">
+	<button class="button button-secondary" id="ubs-refetch-alko-prices"><?php esc_html_e( 'Fetch and process sheet', 'ubs' ); ?></button>
+	<span class="spinner"></span>
+	<span id="ubs-price-sheet-message">
 	<?php
+	$last_fetched = get_option( 'ubs_beers_fetched' );
+	if ( empty( $last_fetched ) ) :
+		?>
+		<?php echo wp_kses_post( '<span class="dashicons dashicons-warning"></span> Price sheet has not been fetched and processed yet. Click the button!', 'ubs' ); ?>
+		<?php else : ?>
+			<?php echo wp_kses_post( '<span class="dashicons dashicons-yes-alt"></span> Last fetched:', 'ubs' ); ?> <span id="ubs-price-sheet-fetched"><?php echo esc_attr( wp_date( 'j.n.Y H:i', get_option( 'ubs_beers_fetched' ) ) ); ?></span>
+		<?php	endif; ?>
+		</span>
+		</p>
+	<?php
+	wp_nonce_field( 'ubs_settings', 'ubs_settings_nonce' );
 }
 
 /**
@@ -152,7 +143,7 @@ function ubs_setting_alko_favorite_store() {
 	$options = get_option( 'ubs_settings' );
 	?>
 	<input type="text" size="6" name="ubs_settings[ubs_setting_alko_favorite_store]" value="<?php echo isset( $options['ubs_setting_alko_favorite_store'] ) ? esc_attr( $options['ubs_setting_alko_favorite_store'] ) : ''; ?>" />
-	<p class="description"><?php _e( 'Enter Alko store ID. You can extract the numeric ID from Alko store URL by first <a target="_blank" href="https://www.alko.fi/myymalat-palvelut">selecting a store</a>.' ); ?></p>
+	<p class="description"><?php echo wp_kses_post( sprintf( 'Enter Alko store ID. You can extract the numeric ID from Alko store URL by first <a target="_blank" href="%s">selecting a store</a>.', esc_url( __( 'https://www.alko.fi/myymalat-palvelut', 'ubs' ) ) ) ); ?></p>
 	<?php
 }
 
@@ -177,7 +168,10 @@ function ubs_settings_section_untappd_callback() {
 function ubs_settings_section_alko_callback() {
 	?>
 	<p>
-	<?php echo wp_kses_post( __( 'Alko price sheet (XLSX) can be used to autocomplete beer search against the Alko catalog. <a href="https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto">Download Alko price sheet</a> and upload it to Media Library for use here.', 'ubs' ) ); ?>
+	<?php echo wp_kses_post( __( 'Alko price sheet (XLSX) can be used to autocomplete beer search against the Alko catalog.', 'ubs' ) ); ?>
+	</p>
+	<p>
+	<?php echo wp_kses_post( __( 'You can also enter the numeric ID of your favorite local Alko store to obtain availability information.', 'ubs' ) ); ?>
 	</p>
 	<?php
 }
@@ -188,6 +182,10 @@ function ubs_settings_section_alko_callback() {
  * @return void
  */
 function ubs_render_options_page() {
+
+	// Enqueue scripts and styles.
+	wp_enqueue_style( 'ubs-settings-styles', plugin_dir_url( __FILE__ ) . '/css/untappd-beer-settings.css', array(), filemtime( plugin_dir_path( __FILE__ ) . 'css/untappd-beer-settings.css' ) );
+	wp_enqueue_script( 'ubs-settings-scripts', plugin_dir_url( __FILE__ ) . '/js/untappd-beer-settings.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . 'js/untappd-beer-settings.js' ), true );
 
 	// Check if the user have submitted the settings.
 	// WordPress will add the "settings-updated" $_GET parameter to the url.

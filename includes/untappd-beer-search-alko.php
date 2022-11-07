@@ -1,6 +1,6 @@
 <?php
 /**
- * Untappd Beer Search — process Alko price sheet (XLSX)
+ * Untappd Beer Search — fetch and process Alko price sheet (XLSX)
  *
  * Price sheet is available at:
  * https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto
@@ -13,30 +13,56 @@
  */
 
 // Load composerized dependencies.
-
 require plugin_dir_path( __FILE__ ) . '../vendor/autoload.php';
 use Shuchkin\SimpleXLSX;
 
 /**
- * Process Alko price sheet when settings updated.
+ * Fetch and process Alko price sheet.
  *
- * @param  mixed  $old_value Old option value.
- * @param  mixed  $value     New option value.
- * @param  string $option    Option name.
- * @return void
+ * @return string|WP_Error Update timestamp, if successful. WP_Error if errored.
  */
-function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
-	$price_sheet_attachment_id = $value['ubs_setting_alko_price_sheet'];
+function ubs_process_alko_price_sheet() {
 
-	if ( empty( $price_sheet_attachment_id ) ) {
-		return;
+	// Get settings to determine the Alko price sheet URL.
+	$options              = get_option( 'ubs_settings' );
+	$alko_price_sheet_url = esc_url( $options['ubs_setting_alko_price_sheet'] );
+
+	// Remotely get the price sheet file.
+	$response      = wp_remote_get( $alko_price_sheet_url );
+	$response_code = wp_remote_retrieve_response_code( $response );
+	$response_body = wp_remote_retrieve_body( $response );
+
+	if ( 200 !== $response_code || empty( $response_body ) ) {
+		return new WP_Error( -2, esc_html__( '<span class="dashicons dashicons-warning"></span> Remote request to Alko price sheet failed. URL: ', 'ubs' ) . esc_url( $alko_price_sheet_url ) );
 	}
 
-	$alko_price_sheet_file = get_attached_file( $price_sheet_attachment_id );
+	// Determine uploads directory path.
+	$upload_dir = wp_upload_dir();
 
-	$alko_prices_data = new SimpleXLSX( $alko_price_sheet_file );
+	// Check if the uploads directory id writable.
+	if ( true !== wp_is_writable( $upload_dir['basedir'] ) ) {
+		return new WP_Error( -3, esc_html__( '<span class="dashicons dashicons-warning"></span> Uploads directory not writable. Alko price sheet cannot be downloaded.', 'ubs' ) );
+	}
 
-	if ( $alko_prices_data->success() ) {
+	// Define the name and path for the price sheet file to be saved.
+	$alko_file = trailingslashit( $upload_dir['basedir'] ) . 'alko_price_sheet.xlsx';
+
+	// Get filesystem and credentials.
+	global $wp_filesystem;
+	if ( ! is_a( $wp_filesystem, 'WP_Filesystem_Base' ) ) {
+		$creds = request_filesystem_credentials( site_url() );
+		wp_filesystem( $creds );
+	}
+
+	// Save remote response body to file.
+	$file_saved = $wp_filesystem->put_contents( $alko_file, $response_body );
+
+	// Parse the XLSX file.
+	$alko_prices_data = SimpleXLSX::parse( $alko_file );
+
+	// If parsing was successful, process the data.
+	if ( $alko_prices_data ) {
+
 		$header_row_found          = false;
 		$price_list_category_index = false;
 		$beer_wort_abv_index       = false;
@@ -107,10 +133,44 @@ function ubs_process_alko_price_sheet( $old_value, $value, $option ) {
 		}
 
 		// Save Alko catalog to 'wp_options' table.
-		update_option( 'ubs_beers', $beers, false );
+		$updated_beers_option    = update_option( 'ubs_beers', $beers, false );
+		$updated_beers_timestamp = update_option( 'ubs_beers_fetched', time(), false );
+
+		// If options updated successfully, return date when updated.
+		if ( true === $updated_beers_option && true === $updated_beers_timestamp ) {
+			return wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), time() );
+		} else {
+			return new WP_Error( -4, __( '⚠ Error saving Alko catalog to database.', 'ubs' ) );
+		}
 	} else {
-		wp_die( esc_html( $alko_prices_data->error() ) );
+		// If processing failed, return WP_Error.
+		return new WP_Error( -1, __( '<span class="dashicons dashicons-warning"></span> SimpleXLSX error: ', 'ubs' ) . esc_html( SimpleXLSX::parseError() ) );
 	}
 }
-add_action( 'update_option_ubs_settings', 'ubs_process_alko_price_sheet', 10, 3 );
 
+/**
+ * Process AJAX request to search for a beer.
+ *
+ * Echo results HTML.
+ *
+ * @return void
+ */
+function ubs_fetch_process_alko_price_sheet() {
+
+	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_settings' ) ) {
+		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+	}
+
+	$prices_fetched = ubs_process_alko_price_sheet();
+
+	if ( is_wp_error( $prices_fetched ) ) {
+		wp_send_json_error( $prices_fetched );
+	}
+
+	wp_send_json_success(
+		array(
+			'sheet_updated' => $prices_fetched,
+		)
+	);
+}
+add_action( 'wp_ajax_ubs_fetch_alko_price_sheet', 'ubs_fetch_process_alko_price_sheet' );

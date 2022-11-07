@@ -49,7 +49,13 @@ function ubs_render_search_page() {
 		<p>
 			<?php
 			// Get Alko beers catalog.
-			$beers_alko = get_option( 'ubs_beers', true );
+			$beers_alko = get_option( 'ubs_beers' );
+
+			if ( false === $beers_alko ) {
+				// translators: plugin settings page URL.
+				echo wp_kses_post( sprintf( __( '<span class="dashicons dashicons-warning"></span> Alko price sheet has not been fetched. Go to <a href="%s">Settings</a> and fetch the data first.', 'ubs' ), menu_page_url( 'ubs-settings', false ) ) );
+				return;
+			}
 
 			// Get all saved beers.
 			$saved_beers = ubs_get_saved_beers_alko_ids();
@@ -61,9 +67,9 @@ function ubs_render_search_page() {
 				}
 			}
 
-			if ( count( $beers_alko ) > 1 ) {
+			if ( count( $beers_alko ) >= 1 ) {
 				// translators: number of beers in Alko catalog not yet saved.
-				echo wp_kses_post( sprintf( __( 'There are <kbd><span id="ubs-beers-left-to-save">%d</span></kbd> beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', 'ubs' ), count( $beers_alko ) ) );
+				echo wp_kses_post( sprintf( _n( 'There is <kbd><span id="ubs-beers-left-to-save">%d</span></kbd> beer in Alko product catalog that is not yet saved. Use the "Populate" button to search for it.', 'There are <kbd><span id="ubs-beers-left-to-save">%d</span></kbd> beers in Alko product catalog that are not yet saved. Use the "Populate" button to search for one of those.', count( $beers_alko ), 'ubs' ), count( $beers_alko ) ) );
 			} else {
 				esc_html_e( 'You have saved all Alko beers. Congratulations! 👍', 'ubs' );
 			}
@@ -383,7 +389,7 @@ function ubs_populate_search_field_with_alko_product() {
 	}
 
 	// Get Alko beer catalog.
-	$beers = get_option( 'ubs_beers', true );
+	$beers = get_option( 'ubs_beers' );
 
 	// Get all saved beers.
 	$saved_alko_beers_ids = ubs_get_saved_beers_alko_ids();
