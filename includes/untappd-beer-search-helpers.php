@@ -81,7 +81,7 @@ function ubs_get_beer_rating( $object ) {
 function ubs_search_alko_catalog_for_name( $beer_name_to_search ) {
 
 	// Get Alko catalog.
-	$beers = get_option( 'ubs_beers', true );
+	$beers = get_option( 'ubs_beers' );
 
 	$matches        = array();
 	$return_results = array();
