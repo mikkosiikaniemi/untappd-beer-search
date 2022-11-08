@@ -118,7 +118,6 @@ function ubs_setting_alko_price_sheet() {
 	<p class="description ubs-settings-description"><?php esc_html_e( 'Enter Alko price sheet URL. The default location is pre-filled.', 'ubs' ); ?></p>
 	<p class="ubs-fetch-wrapper">
 	<button class="button button-secondary" id="ubs-refetch-alko-prices"><?php esc_html_e( 'Fetch and process sheet', 'ubs' ); ?></button>
-	<span class="spinner"></span>
 	<span id="ubs-price-sheet-message">
 	<?php
 	$last_fetched = get_option( 'ubs_beers_fetched' );
@@ -129,6 +128,7 @@ function ubs_setting_alko_price_sheet() {
 			<?php echo wp_kses_post( '<span class="dashicons dashicons-yes-alt"></span> Last fetched:', 'ubs' ); ?> <span id="ubs-price-sheet-fetched"><?php echo esc_attr( wp_date( 'j.n.Y H:i', get_option( 'ubs_beers_fetched' ) ) ); ?></span>
 		<?php	endif; ?>
 		</span>
+		<span class="spinner"></span>
 		</p>
 	<?php
 	wp_nonce_field( 'ubs_settings', 'ubs_settings_nonce' );
