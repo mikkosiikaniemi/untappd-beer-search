@@ -6,6 +6,18 @@ A browser extension for Mozilla Firefox is included. The extension is able to in
 
 Contains ability to import [Alko product catalog](https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto) and use it to autocomplete beer search against the Alko catalog.
 
+## Getting started
+
+1. Clone this repository to `wp-content/plugins`.
+1. Run `composer install` to install the [Shuchkin\SimpleXLSX](https://github.com/shuchkin/simplexlsx) dependency. It is needed for processing the Alko product catalog (available only in XLSX format).
+1. Run `npm install` to install the [jquery.tablesorter](https://mottie.github.io/tablesorter/docs/). It is used to add dynamic column sorting to top beers tables.
+1. Activate the plugin.
+1. Fill in the plugin settings:
+    * Fill in your Untappd API credentials.
+    * Fill in your favorite [Alko store ID](https://www.alko.fi/myymalat-palvelut).
+    * Fetch the Alko price sheet data for the first time.
+1. Start making beer searches against Untappd database in "Search Untappd" plugin page.
+
 ## Sequence diagram
 ```mermaid
 sequenceDiagram
