@@ -184,12 +184,19 @@ function ubs_populate_custom_beer_columns( $column, $post_id ) {
 			echo ' ';
 			echo '<a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . absint( $beer_id ) . ' <span class="dashicons dashicons-external"></span></a><br/>';
 
-			$alko_id = get_post_meta( $post_id, 'alko_id', true );
+			$alko_id             = get_post_meta( $post_id, 'alko_id', true );
+			$additional_alko_ids = get_post_meta( $post_id, 'additional_alko_id' );
 			esc_html_e( 'Alko' );
 			echo ' ';
 			if ( false === empty( $alko_id ) ) {
 				$padded_alko_id = str_pad( $alko_id, 6, '0', STR_PAD_LEFT );
 				echo '<a target="_blank" href="https://www.alko.fi/tuotteet/' . esc_attr( $padded_alko_id ) . '">' . esc_attr( $padded_alko_id ) . ' <span class="dashicons dashicons-external"></span></a>';
+
+				foreach ( $additional_alko_ids as $additional_alko_id ) {
+					echo ', ';
+					$padded_alko_id = str_pad( $additional_alko_id, 6, '0', STR_PAD_LEFT );
+					echo '<a target="_blank" href="https://www.alko.fi/tuotteet/' . esc_attr( $padded_alko_id ) . '">' . esc_attr( $padded_alko_id ) . ' <span class="dashicons dashicons-external"></span></a>';
+				}
 			} else {
 				esc_html_e( 'N/A', 'ubs' );
 			}
