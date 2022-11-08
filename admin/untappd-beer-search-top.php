@@ -250,7 +250,7 @@ function ubs_render_top_beers_page() {
 			<?php ubs_render_beer_listing( $bottom_available_beers_query, $favorite_alko_store ); ?>
 
 			<h2><?php esc_html_e( 'Update availability', 'ubs' ); ?></h2>
-			<p><?php esc_html_e( 'You can update availability of all beers in your favorite Alko store. This may take a while.', 'ubs' ); ?></p>
+			<p><?php esc_html_e( 'You can update availability of all beers in your favorite Alko store and Alko online. This may take a while.', 'ubs' ); ?></p>
 			<form id="ubs-update-availability" action="" method="post">
 				<?php wp_nonce_field( 'update-availability' ); ?>
 				<button type="submit" id="ubs-update-button" name="ubs-update-button" class="button button-primary"><?php esc_html_e( 'Update availability', 'ubs' ); ?></button>
