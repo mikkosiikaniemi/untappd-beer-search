@@ -137,9 +137,11 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 
 	$html = '<p>';
 	// translators: amount of search results.
-	$html .= sprintf( __( 'Found %d results.', 'ubs' ), $result_array['beers']['count'] );
+	$html .= sprintf( _n( 'Found <kbd>%d</kbd> result.', 'Found <kbd>%d</kbd> results.', $result_array['beers']['count'], 'ubs' ), $result_array['beers']['count'] );
 	$html .= ' ';
-	$html .= __( 'The beer with most Untappd check-ins has been preselected.', 'ubs' );
+	if ( $result_array['beers']['count'] > 1 ) {
+		$html .= __( 'The beer with most Untappd check-ins has been preselected.', 'ubs' );
+	}
 	$html .= '</p>';
 
 	$html .= '<form id="ubs-search-results" action="" method="post">';
@@ -206,6 +208,9 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 		}
 	}
 
+	// Initialize a variable to determine if a candidate for saving found.
+	$candidate_for_saving_not_found = true;
+
 	$html .= '<tbody>';
 	foreach ( $result_array['beers']['items'] as $beer ) {
 		// Get the Untappd beer ID.
@@ -218,7 +223,8 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 
 		$beer_post_id = ubs_maybe_get_beer_cpt_id( $beer_id );
 		if ( $beer_id === $beer_with_most_checkins && false === get_post_status( $beer_post_id ) ) {
-			$html .= ' checked="checked"';
+			$html                          .= ' checked="checked"';
+			$candidate_for_saving_not_found = false;
 		} elseif ( false !== get_post_status( $beer_post_id ) ) {
 			$html .= ' disabled="disabled"';
 		}
@@ -245,9 +251,15 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 		$html .= '<td id="beer-save-' . $beer_id . '">';
 
 		if ( false !== $beer_post_id ) {
-			$html .= __( '☑️', 'ubs' );
-			$html .= ' <a target="_blank" href="https://www.alko.fi/tuotteet/' . str_pad( $beer_post_id, 6, '0', STR_PAD_LEFT ) . '">' . $beer_post_id . '<span class="dashicons dashicons-external"></span></a>';
-			$html .= '<button class="button button-secondary button-small ubs-associate-alko" data-post-id="' . $beer_post_id . '" title="' . esc_html__( 'Associate with this saved beer', 'ubs' ) . '">' . __( 'Associate', 'ubs' ) . '</button>';
+			$saved_alko_id = get_post_meta( $beer_post_id, 'alko_id', true );
+			$html         .= __( '☑️', 'ubs' );
+			$html         .= ' <a target="_blank" href="https://www.alko.fi/tuotteet/' . str_pad( absint( $saved_alko_id ), 6, '0', STR_PAD_LEFT ) . '" title="' . absint( $saved_alko_id ) . ' &mdash; ' . get_the_title( $beer_post_id ) . '">' . $beer_post_id . '<span class="dashicons dashicons-external"></span></a>';
+
+			$additional_alko_ids = get_post_meta( $beer_post_id, 'additional_alko_id' );
+
+			if ( $saved_alko_id !== $alko_id && false === in_array( $alko_id, $additional_alko_ids, true ) ) {
+				$html .= '<button class="button button-secondary button-small ubs-associate-alko" data-post-id="' . $beer_post_id . '" title="' . esc_html__( 'Associate with this saved beer', 'ubs' ) . '">' . __( 'Associate', 'ubs' ) . '</button>';
+			}
 		} else {
 			$html .= __( '—', 'ubs' );
 		}
@@ -258,8 +270,23 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 
 	$html .= '</table>';
 	$html .= wp_nonce_field( 'ubs_save', 'ubs_save_nonce', true, false );
-	$html .= '<button class="button button-primary" type="submit">' . __( 'Save selected', 'ubs' ) . '</button>';
-	$html .= '<button class="button button-secondary" id="ubs-save-and-populate">' . __( 'Save and populate next', 'ubs' ) . '</button>';
+
+	// Disable save buttons if only one result found and it has already been saved.
+	$single_result_already_saved = false;
+	if ( 1 === $result_array['beers']['count'] && false !== get_post_status( ubs_maybe_get_beer_cpt_id( $result_array['beers']['items'][0]['beer']['bid'] ) ) ) {
+		$single_result_already_saved = true;
+	}
+
+	$html .= '<button name="ubs-save" class="button button-primary" type="submit"';
+	if ( $single_result_already_saved || $candidate_for_saving_not_found ) {
+		$html .= ' disabled="disabled"';
+	}
+	$html .= '">' . __( 'Save selected', 'ubs' ) . '</button>';
+	$html .= '<button name="ubs-save-and-populate" class="button button-secondary" id="ubs-save-and-populate"';
+	if ( $single_result_already_saved || $candidate_for_saving_not_found ) {
+		$html .= ' disabled="disabled"';
+	}
+	$html .= '">' . __( 'Save and populate next', 'ubs' ) . '</button>';
 	$html .= '<span class="spinner"></span>';
 	$html .= '</form>';
 
@@ -298,9 +325,10 @@ function ubs_preprocess_beer_for_saving( $beer_id, $alko_id ) {
 			$status = get_post_meta( $saved_beer, 'rating_score', true );
 		}
 	}
-	$return_results[ $beer_id ] = array(
+	$return_results = array(
 		'status'          => $status,
 		'limit_remaining' => $beer_info['limit_remaining'],
+		'beer_id'         => $beer_id,
 	);
 
 	return $return_results;

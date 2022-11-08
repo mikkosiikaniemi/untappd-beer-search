@@ -1,13 +1,9 @@
-jQuery(function($) {
+jQuery(function ($) {
 
 	// Process search form submit action.
-	$('#ubs-search').on( 'submit', function ( event, alko_id ) {
-
-		var populate_button_orig_state = $("#ubs-alko-populate").attr("disabled");
+	$('#ubs-search').on('submit', function (event, alko_id) {
 
 		$("#ubs-search .spinner").addClass("is-active");
-		$("#ubs-search [type=submit]").attr("disabled", true);
-		$("#ubs-alko-populate").attr("disabled", true);
 
 		var beer_name = $('#beer-name').val();
 		var options = $("#beer-names option");
@@ -34,19 +30,54 @@ jQuery(function($) {
 
 		$.post(ajaxurl, data, function (response) {
 			$('#ubs-untappd-response').html(response);
+
+			// Hide "Associate" button if beer already saved.
+			var selected_alko_id = $('select#alko_id').val();
+			if ($('button[data-post-id="' + selected_alko_id + '"]')) {
+				$('button[data-post-id="' + selected_alko_id + '"]').hide();
+			}
+
 			$("#ubs-search .spinner").removeClass("is-active");
-			$("#ubs-search [type=submit]").attr("disabled", false);
-			$("#ubs-alko-populate").attr("disabled", populate_button_orig_state);
 		});
 
 		return false;
 	});
 
+	/**
+	 * Dynamically watch for Alko ID select element changes, and hide/show
+	 * "Associate" button respectively.
+	 */
+	$(document).on('change', 'select#alko_id', function (element) {
+		var selected_alko_id = $(this).val();
+		$('.ubs-associate-alko').each(function () {
+			var button = $(this);
+			if (button.data('post-id') == selected_alko_id) {
+				button.hide();
+			} else {
+				button.show();
+			}
+		});
+	});
+
+	/**
+	 * Dynamically watch for beer select (radio buttons); if none was selected
+	 * to begin with, save buttons were disabled. Enable them if selection made
+	 * later.
+	 */
+	 $(document).on('change', 'input[name="beer-id[]"]', function (element) {
+		 $('button[name^="ubs-save"]').prop('disabled', false);
+	});
+
 	// Process save form submit action.
 	$(document).on('submit', '#ubs-search-results', function (element) {
 
+		// Determine which submit button was pressed.
+		var form_action = element.originalEvent.submitter.name;
+
+		// Disable submit buttons.
+		$("#ubs-search-results button").prop('disabled', true);
+
 		$("#ubs-search-results .spinner").addClass("is-active");
-		$("#ubs-search-results [type=submit]").attr("disabled", true);
 
 		var data = {
 			action: 'ubs_save_selected_results',
@@ -63,18 +94,29 @@ jQuery(function($) {
 
 		$.post(ajaxurl, data, function (response) {
 
-			var results = $.parseJSON(response);
-			$.each(results, function (beer_id, beer_data) {
-				if ($.isNumeric(beer_data.status)) {
-					$('#beer-check-' + beer_id).prop("checked", true).attr("disabled", true);
-					$('#beer-save-' + beer_id).html('☑️ ' + ' Rating: ' + Number(beer_data.status).toFixed(2));
-				} else {
-					$('#beer-save-' + beer_id).html(beer_data.status);
+			var result = JSON.parse(response);
+
+			if (false === isNaN(result.status)) {
+
+				// If "Save and populate next" pressed, trigger new "populate" click.
+				if (form_action === 'ubs-save-and-populate') {
+					$('#ubs-untappd-response').html('');
+					$("#ubs-alko-populate").trigger("click");
+					return;
 				}
-				$("#ubs-limit-remaining").html(beer_data.limit_remaining);
-			});
+
+				$('#beer-check-' + result.beer_id).prop("checked", true).attr("disabled", true);
+				$('#beer-save-' + result.beer_id).html('☑️ ' + ' Rating: ' + Number(result.status).toFixed(2));
+			} else {
+				$('#beer-save-' + result.beer_id).html(result.status);
+				$("#ubs-search-results button").prop('disabled', false);
+			}
+
+			// Update API requests numeric limit.
+			$("#ubs-limit-remaining").html(result.limit_remaining);
 
 			$("#ubs-search-results .spinner").removeClass("is-active");
+
 		});
 
 		return false;
@@ -85,8 +127,6 @@ jQuery(function($) {
 		element.preventDefault();
 
 		$("#ubs-search .spinner").addClass("is-active");
-		$("#ubs-alko-populate").attr("disabled", true);
-		$("#ubs-search [type=submit]").attr("disabled", true);
 
 		var data = {
 			action: 'ubs_populate_alko_product',
@@ -99,7 +139,7 @@ jQuery(function($) {
 				$('#beer-name').val(response.data.beer_name);
 			}
 
-			$('#ubs-search').trigger( 'submit', [ response.data.alko_id ] );
+			$('#ubs-search').trigger('submit', [response.data.alko_id]);
 		});
 
 		return false;
