@@ -393,7 +393,11 @@ function ubs_render_beer_listing( $beer_query, $favorite_alko_store = false ) {
 		foreach ( $beer_query->posts as $beer_post ) {
 			echo '<tr>';
 			echo '<td><a target="_blank" href="https://www.alko.fi/tuotteet/' . absint( get_post_meta( $beer_post->ID, 'alko_id', true ) ) . '">' . esc_attr( $beer_post->post_excerpt ) . '</a></td>';
-			echo '<td>' . number_format( get_post_meta( $beer_post->ID, 'rating_score', true ), 2 ) . '</td>';
+
+			$beer_slug = get_post_meta( $beer_post->ID, 'beer_slug', true );
+			$beer_id   = get_post_meta( $beer_post->ID, 'bid', true );
+			echo '<td><a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . number_format( get_post_meta( $beer_post->ID, 'rating_score', true ), 2 ) . '</a></td>';
+
 			echo '<td>' . esc_attr( get_post_meta( $beer_post->ID, 'beer_style', true ) ) . '</td>';
 			echo '<td>' . number_format( get_post_meta( $beer_post->ID, 'beer_abv', true ), 1 ) . '</td>';
 			if ( false !== $favorite_alko_store ) {
