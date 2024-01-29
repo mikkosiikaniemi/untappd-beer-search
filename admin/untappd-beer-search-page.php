@@ -83,7 +83,7 @@ function ubs_render_search_page() {
 						<label for="beer-name"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
 					</th>
 					<td>
-						<input type="text" class="regular-text" name="beer_name" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
+						<input type="text" class="regular-text" name="beer_name" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" data-placeholder-empty="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" data-placeholder-populating="<?php esc_attr_e( 'Populating...', 'ubs' ); ?>" required list="beer-names" autofocus />
 						<datalist id="beer-names">
 							<?php
 							$beers = get_option( 'ubs_beers' );

@@ -22,6 +22,9 @@ jQuery(function ($) {
 			}
 		}
 
+		$('#beer-name').prop('readonly', false);
+		$('#beer-name').attr('placeholder', $('#beer-name').data('placeholder-empty'));
+
 		var data = {
 			action: 'ubs_get_search_results',
 			beer_name: beer_name,
@@ -37,6 +40,7 @@ jQuery(function ($) {
 			if ($('button[data-post-id="' + selected_alko_id + '"]')) {
 				$('button[data-post-id="' + selected_alko_id + '"]').hide();
 			}
+
 
 			$('.submit .button').prop('disabled', false);
 			$("#ubs-search .spinner").removeClass("is-active");
@@ -66,8 +70,8 @@ jQuery(function ($) {
 	 * to begin with, save buttons were disabled. Enable them if selection made
 	 * later.
 	 */
-	 $(document).on('change', 'input[name="beer-id[]"]', function (element) {
-		 $('button[name^="ubs-save"]').prop('disabled', false);
+	$(document).on('change', 'input[name="beer-id[]"]', function (element) {
+		$('button[name^="ubs-save"]').prop('disabled', false);
 	});
 
 	// Process save form submit action.
@@ -128,6 +132,7 @@ jQuery(function ($) {
 	$(document).on('click', '#ubs-alko-populate', function (element) {
 		element.preventDefault();
 
+		$('#beer-name').attr('placeholder', $('#beer-name').data('placeholder-populating')).prop('readonly', true);
 		$("#ubs-search .spinner").addClass("is-active");
 		$('.submit .button').prop('disabled', true);
 
