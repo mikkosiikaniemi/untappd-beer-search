@@ -132,7 +132,7 @@ jQuery(function ($) {
 	$(document).on('click', '#ubs-alko-populate', function (element) {
 		element.preventDefault();
 
-		$('#beer-name').attr('placeholder', $('#beer-name').data('placeholder-populating')).prop('readonly', true);
+		$('#beer-name').val('').attr('placeholder', $('#beer-name').data('placeholder-populating')).prop('readonly', true);
 		$("#ubs-search .spinner").addClass("is-active");
 		$('.submit .button').prop('disabled', true);
 
