@@ -77,27 +77,37 @@ function ubs_render_search_page() {
 			?>
 		</p>
 		<form id="ubs-search" action="" method="post">
-			<label for="beer-name" class="screen-reader-text"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
-			<input type="text" name="beer_name" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
-			<datalist id="beer-names">
-				<?php
-				$beers = get_option( 'ubs_beers' );
-				if ( false !== $beers && false === empty( $beers ) ) {
-					foreach ( $beers as $alko_id => $beer_name ) {
-						echo '<option data-alko-id="' . absint( $alko_id ) . '">' . esc_attr( $beer_name ) . '</option>';
-					}
-				}
-				?>
-			</datalist>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">
+						<label for="beer-name"><?php esc_attr_e( 'Beer Name', 'ubs' ); ?></label>
+					</th>
+					<td>
+						<input type="text" class="regular-text" name="beer_name" id="beer-name" placeholder="<?php esc_attr_e( 'Beer name...', 'ubs' ); ?>" required list="beer-names" autofocus />
+						<datalist id="beer-names">
+							<?php
+							$beers = get_option( 'ubs_beers' );
+							if ( false !== $beers && false === empty( $beers ) ) {
+								foreach ( $beers as $alko_id => $beer_name ) {
+									echo '<option data-alko-id="' . absint( $alko_id ) . '">' . esc_attr( $beer_name ) . '</option>';
+								}
+							}
+							?>
+						</datalist>
+					</td>
+				</tr>
+			</table>
 			<?php wp_nonce_field( 'ubs_search', 'ubs_search_nonce' ); ?>
-			<button id="ubs-search-submit" class="button button-primary" type="submit"><?php esc_attr_e( 'Search', 'ubs' ); ?></button>
-			<button id="ubs-alko-populate" class="button button-secondary"
-			<?php
-			if ( count( $beers_alko ) < 1 ) {
-				echo 'disabled';}
-			?>
-			><?php esc_attr_e( 'Populate', 'ubs' ); ?></button>
-			<span class="spinner"></span>
+			<p class="submit">
+				<input id="ubs-search-submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Search', 'ubs' ); ?>" />
+				<button id="ubs-alko-populate" class="button button-secondary"
+				<?php
+				if ( count( $beers_alko ) < 1 ) {
+					echo 'disabled';}
+				?>
+				><?php esc_attr_e( 'Populate', 'ubs' ); ?></button>
+				<span class="spinner"></span>
+				</p>
 		</form>
 		<div id="ubs-untappd-response"></div>
 	</div>
@@ -108,11 +118,11 @@ function ubs_render_search_page() {
  * Generate the HTML code to render the search results.
  *
  * @param  array  $result_array Search results.
- * @param  int    $alko_id      Alko product ID pre-selected in search input.
  * @param  string $beer_name    Beer name that was searched for.
+ * @param  int    $alko_id      Alko product ID pre-selected in search input.
  * @return mixed  $html         HTML-formatted table.
  */
-function ubs_render_search_results( $result_array, $alko_id = false, $beer_name ) {
+function ubs_render_search_results( $result_array, $beer_name, $alko_id = false ) {
 
 	// If rate limit reached, return early.
 	if ( is_wp_error( $result_array ) ) {
@@ -185,7 +195,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 	$html .= '<th>';
 	$html .= __( 'Beer Name', 'ubs' );
 	$html .= '</th>';
-	$html .= '<th>';
+	$html .= '<th class="ubs-search-results__style">';
 	$html .= __( 'Beer Style', 'ubs' );
 	$html .= '</th>';
 	$html .= '<th>';
@@ -242,7 +252,7 @@ function ubs_render_search_results( $result_array, $alko_id = false, $beer_name 
 		$html .= '<td>';
 		$html .= esc_attr( $beer['beer']['beer_name'] );
 		$html .= '</td>';
-		$html .= '<td>';
+		$html .= '<td  class="ubs-search-results__style">';
 		$html .= esc_attr( $beer['beer']['beer_style'] );
 		$html .= '</td>';
 		$html .= '<td>';
@@ -344,7 +354,7 @@ function ubs_preprocess_beer_for_saving( $beer_id, $alko_id ) {
 function ubs_process_ajax_search_results() {
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_search' ) ) {
-		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+		wp_die( esc_attr__( 'Nonce check failed. Please reload the page and try again.', 'ubs' ) );
 	}
 
 	if ( false === isset( $_POST['beer_name'] ) ) {
@@ -363,7 +373,7 @@ function ubs_process_ajax_search_results() {
 	$search_result = ubs_search_beer_in_untappd( $beer_name );
 
 	// Render search results, hang on to the Alko product number.
-	$results_html = ubs_render_search_results( $search_result, $alko_id, $beer_name );
+	$results_html = ubs_render_search_results( $search_result, $beer_name, $alko_id );
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo $results_html;
@@ -381,7 +391,7 @@ add_action( 'wp_ajax_ubs_get_search_results', 'ubs_process_ajax_search_results' 
 function ubs_process_ajax_save_results() {
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_save' ) ) {
-		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+		wp_die( esc_attr__( 'Nonce check failed. Please reload the page and try again.', 'ubs' ) );
 	}
 
 	// Get beer ID from form data.
@@ -413,7 +423,7 @@ add_action( 'wp_ajax_ubs_save_selected_results', 'ubs_process_ajax_save_results'
 function ubs_populate_search_field_with_alko_product() {
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_search' ) ) {
-		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+		wp_die( esc_attr__( 'Nonce check failed. Please reload the page and try again.', 'ubs' ) );
 	}
 
 	// Get Alko beer catalog.
@@ -461,7 +471,7 @@ add_action( 'wp_ajax_ubs_populate_alko_product', 'ubs_populate_search_field_with
 function ubs_assosiate_additional_alko_id() {
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_search' ) ) {
-		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+		wp_die( esc_attr__( 'Nonce check failed. Please reload the page and try again.', 'ubs' ) );
 	}
 
 	// Get original "mother" ID from form data.
