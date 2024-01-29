@@ -57,6 +57,10 @@ function ubs_process_alko_price_sheet() {
 	// Save remote response body to file.
 	$file_saved = $wp_filesystem->put_contents( $alko_file, $response_body );
 
+	if ( false === $file_saved ) {
+		return new WP_Error( -6, esc_html__( '<span class="dashicons dashicons-warning"></span> Unable to save price sheet file.', 'ubs' ) );
+	}
+
 	// Parse the XLSX file.
 	$alko_prices_data = SimpleXLSX::parse( $alko_file );
 
@@ -158,7 +162,7 @@ function ubs_process_alko_price_sheet() {
 function ubs_fetch_process_alko_price_sheet() {
 
 	if ( false === isset( $_POST['ubs_nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ubs_nonce'] ) ), 'ubs_settings' ) ) {
-		wp_die( esc_attr__( 'Permission check failed. Please reload the page and try again.', 'ubs' ) );
+		wp_send_json_error( new WP_Error( 403, esc_attr__( 'Nonce check failed. Please reload the page and try again.', 'ubs' ) ) );
 	}
 
 	$prices_fetched = ubs_process_alko_price_sheet();
