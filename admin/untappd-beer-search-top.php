@@ -54,18 +54,28 @@ function ubs_render_top_beers_page() {
 		<h1><?php esc_html_e( 'Top available', 'ubs' ); ?></h1>
 
 		<nav class="nav-tab-wrapper">
+
 			<a href="?post_type=beer&page=ubs-top-beers" class="nav-tab
 			<?php
 			if ( false === $active_tab ) {
 				echo 'nav-tab-active';}
 			?>
 			"><?php esc_html_e( 'Favorite Alko', 'ubs' ); ?></a>
+
 			<a href="?post_type=beer&page=ubs-top-beers&tab=alko_online" class="nav-tab
 			<?php
-			if ( $active_tab ) {
+			if ( 'alko_online' === $active_tab ) {
 				echo 'nav-tab-active';}
 			?>
 			"><?php esc_html_e( 'Alko online', 'ubs' ); ?></a>
+
+			<a href="?post_type=beer&page=ubs-top-beers&tab=update_availability" class="nav-tab
+			<?php
+			if ( 'update_availability' === $active_tab ) {
+				echo 'nav-tab-active';}
+			?>
+			"><?php esc_html_e( 'Update availability', 'ubs' ); ?></a>
+
 		</nav>
 
 		<div class="tab-content">
@@ -248,17 +258,6 @@ function ubs_render_top_beers_page() {
 			?>
 			<h2><?php esc_html_e( 'Worst beers', 'ubs' ); ?></h2>
 			<?php ubs_render_beer_listing( $bottom_available_beers_query, $favorite_alko_store ); ?>
-
-			<h2><?php esc_html_e( 'Update availability', 'ubs' ); ?></h2>
-			<p><?php esc_html_e( 'You can update availability of all beers in your favorite Alko store and Alko online. This may take a while.', 'ubs' ); ?></p>
-			<form id="ubs-update-availability" action="" method="post">
-				<?php wp_nonce_field( 'update-availability' ); ?>
-				<button type="submit" id="ubs-update-button" name="ubs-update-button" class="button button-primary"><?php esc_html_e( 'Update availability', 'ubs' ); ?></button>
-				<span class="spinner"></span>
-			</form>
-			<label class="initially-hidden" for="ubs-update-availability-progress"><?php esc_html_e( 'Update progress:', 'ubs' ); ?> <span id="ubs-update-progess">0</span>/<?php echo absint( wp_count_posts( 'beer' )->publish ); ?></label>
-			<progress class="initially-hidden" id="ubs-update-availability-progress" value="0" max="100"></progress>
-
 			<?php
 			break;
 		case 'alko_online':
@@ -315,6 +314,19 @@ function ubs_render_top_beers_page() {
 
 			<?php
 			break;
+		case 'update_availability':
+			?>
+			<h2><?php esc_html_e( 'Update availability', 'ubs' ); ?></h2>
+			<p><?php esc_html_e( 'You can update availability of all beers in your favorite Alko store and Alko online. This may take a while.', 'ubs' ); ?></p>
+			<form id="ubs-update-availability" action="" method="post">
+				<?php wp_nonce_field( 'update-availability' ); ?>
+				<button type="submit" id="ubs-update-button" name="ubs-update-button" class="button button-primary"><?php esc_html_e( 'Update availability', 'ubs' ); ?></button>
+				<span class="spinner"></span>
+			</form>
+			<label class="initially-hidden" for="ubs-update-availability-progress"><?php esc_html_e( 'Update progress:', 'ubs' ); ?> <span id="ubs-update-progess">0</span>/<?php echo absint( wp_count_posts( 'beer' )->publish ); ?></label>
+			<progress class="initially-hidden" id="ubs-update-availability-progress" value="0" max="100"></progress>
+			<p class="initially-hidden"><?php esc_html_e( 'Estimated time remaining: ', 'ubs' ); ?><span id="ubs-update-availability-time-remaining">—:—</span></p>
+			<?php
 		endswitch;
 	?>
 	</div>
@@ -377,7 +389,7 @@ function ubs_update_availability_ajax() {
 	if ( isset( $_REQUEST['nonce'] ) ) {
 		wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'], 'update-availability' ) ) );
 	} else {
-		wp_send_json_error( __( 'Permission check failed. Please reload the page and try again.', 'ubs' ), 404 );
+		wp_send_json_error( __( 'Nonce check failed. Please reload the page and try again.', 'ubs' ), 404 );
 	}
 
 	if ( isset( $_POST['step'] ) ) {
@@ -423,6 +435,7 @@ function ubs_update_availability_ajax() {
 		echo wp_json_encode(
 			array(
 				'step'       => $step,
+				'step_count' => $steps_count,
 				'batch_size' => $batch_size,
 				'percentage' => number_format( ( ( $step * $batch_size ) / $beer_count ) * 100, 1 ),
 			)
@@ -431,6 +444,7 @@ function ubs_update_availability_ajax() {
 		echo wp_json_encode(
 			array(
 				'step'       => 'done',
+				'step_count' => $steps_count,
 				'batch_size' => $batch_size,
 				'beer_count' => $beer_count,
 				'percentage' => 100,
