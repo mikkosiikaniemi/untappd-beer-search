@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Mikko Siikaniemi
+# Copyright (C) 2024 Mikko Siikaniemi
 # This file is distributed under the same license as the Untappd Beer Search plugin.
 msgid ""
 msgstr ""
@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-11-08T09:02:16+00:00\n"
+"POT-Creation-Date: 2024-01-29T09:04:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: ubs\n"
@@ -55,129 +55,129 @@ msgstr[1] ""
 msgid "You have saved all Alko beers. Congratulations! 👍"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:80
-#: admin/untappd-beer-search-page.php:186
-#: admin/untappd-beer-search-top.php:340
+#: admin/untappd-beer-search-page.php:83
+#: admin/untappd-beer-search-page.php:196
+#: admin/untappd-beer-search-top.php:352
 msgid "Beer Name"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:81
+#: admin/untappd-beer-search-page.php:86
 msgid "Beer name..."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:93
+#: admin/untappd-beer-search-page.php:102
 msgid "Search"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:99
+#: admin/untappd-beer-search-page.php:108
 msgid "Populate"
 msgstr ""
 
 #. translators: amount of search results.
-#: admin/untappd-beer-search-page.php:129
+#: admin/untappd-beer-search-page.php:139
 msgid "No beers found."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:131
+#: admin/untappd-beer-search-page.php:141
 msgid "Sometimes trimming vintages or suffixes like IPA or DDH from beer name may help."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:133
+#: admin/untappd-beer-search-page.php:143
 msgid "Trim & search again"
 msgstr ""
 
 #. translators: amount of search results.
-#: admin/untappd-beer-search-page.php:140
+#: admin/untappd-beer-search-page.php:150
 msgid "Found <kbd>%d</kbd> result."
 msgid_plural "Found <kbd>%d</kbd> results."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/untappd-beer-search-page.php:143
+#: admin/untappd-beer-search-page.php:153
 msgid "The beer with most Untappd check-ins has been preselected."
 msgstr ""
 
 #. translators: Alko product number.
-#: admin/untappd-beer-search-page.php:152
+#: admin/untappd-beer-search-page.php:162
 msgid "Alko product number <kbd>%1$s</kbd> (<a target=\"_blank\" href=\"https://www.alko.fi/tuotteet/%1$s\">Alko product link<span class=\"dashicons dashicons-external\"></span></a>) will be associated with the selected beer."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:156
+#: admin/untappd-beer-search-page.php:166
 msgid "Please select Alko product number to associate with the beer."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:177
+#: admin/untappd-beer-search-page.php:187
 msgid "Save"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:180
+#: admin/untappd-beer-search-page.php:190
 msgid "Beer ID"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:183
+#: admin/untappd-beer-search-page.php:193
 msgid "Brewery"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:189
+#: admin/untappd-beer-search-page.php:199
 msgid "Beer Style"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:192
-#: admin/untappd-beer-search-top.php:343
+#: admin/untappd-beer-search-page.php:202
+#: admin/untappd-beer-search-top.php:355
 #: includes/untappd-beer-search-cpt.php:149
 msgid "ABV%"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:195
+#: admin/untappd-beer-search-page.php:205
 msgid "Already saved?"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:255
+#: admin/untappd-beer-search-page.php:265
 msgid "☑️"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:261
+#: admin/untappd-beer-search-page.php:271
 msgid "Associate with this saved beer"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:261
+#: admin/untappd-beer-search-page.php:271
 msgid "Associate"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:264
+#: admin/untappd-beer-search-page.php:274
 msgid "—"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:284
+#: admin/untappd-beer-search-page.php:294
 msgid "Save selected"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:289
+#: admin/untappd-beer-search-page.php:299
 msgid "Save and populate next"
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:317
+#: admin/untappd-beer-search-page.php:327
 msgid "No beer found with this ID."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:323
+#: admin/untappd-beer-search-page.php:333
 msgid "Saving failed."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:347
-#: admin/untappd-beer-search-page.php:384
-#: admin/untappd-beer-search-page.php:416
-#: admin/untappd-beer-search-page.php:464
-#: admin/untappd-beer-search-top.php:380
-#: includes/untappd-beer-search-alko.php:161
-msgid "Permission check failed. Please reload the page and try again."
+#: admin/untappd-beer-search-page.php:357
+#: admin/untappd-beer-search-page.php:394
+#: admin/untappd-beer-search-page.php:426
+#: admin/untappd-beer-search-page.php:474
+#: admin/untappd-beer-search-top.php:392
+#: includes/untappd-beer-search-alko.php:165
+msgid "Nonce check failed. Please reload the page and try again."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:351
+#: admin/untappd-beer-search-page.php:361
 msgid "Please enter a search term."
 msgstr ""
 
-#: admin/untappd-beer-search-page.php:447
+#: admin/untappd-beer-search-page.php:457
 msgid "Congratulations! All beers have been saved."
 msgstr ""
 
@@ -249,87 +249,92 @@ msgstr ""
 msgid "Top available"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:62
+#: admin/untappd-beer-search-top.php:63
 #: includes/untappd-beer-search-cpt.php:155
 msgid "Favorite Alko"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:68
+#: admin/untappd-beer-search-top.php:70
 #: includes/untappd-beer-search-cpt.php:158
 msgid "Alko online"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:80
-msgid "Please enter favorite Alko store ID in settings first. After that, update beer availabilities to see a list here."
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:106
-msgid "Top beers"
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:107
-msgid "These beers are available & ranked highest in your favorite Alko store."
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:137
-msgid "Top \"keskivahva\" beers"
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:166
-msgid "Top sour beers"
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:196
-msgid "Top Finnish beers"
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:225
-msgid "Top non-alcoholic beers"
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:249
-msgid "Worst beers"
-msgstr ""
-
-#: admin/untappd-beer-search-top.php:252
-#: admin/untappd-beer-search-top.php:256
+#: admin/untappd-beer-search-top.php:77
+#: admin/untappd-beer-search-top.php:319
+#: admin/untappd-beer-search-top.php:323
 msgid "Update availability"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:253
-msgid "You can update availability of all beers in your favorite Alko store and Alko online. This may take a while."
+#: admin/untappd-beer-search-top.php:90
+msgid "Please enter favorite Alko store ID in settings first. After that, update beer availabilities to see a list here."
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:116
+msgid "Top beers"
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:117
+msgid "These beers are available & ranked highest in your favorite Alko store."
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:147
+msgid "Top \"keskivahva\" beers"
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:176
+msgid "Top sour beers"
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:206
+msgid "Top Finnish beers"
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:235
+msgid "Top non-alcoholic beers"
 msgstr ""
 
 #: admin/untappd-beer-search-top.php:259
-msgid "Update progress:"
+msgid "Worst beers"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:284
+#: admin/untappd-beer-search-top.php:283
 msgid "Top rated beers"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:313
+#: admin/untappd-beer-search-top.php:312
 msgid "Top rated non-alcoholic beers"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:334
+#: admin/untappd-beer-search-top.php:320
+msgid "You can update availability of all beers in your favorite Alko store and Alko online. This may take a while."
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:326
+msgid "Update progress:"
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:328
+msgid "Estimated time remaining: "
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:346
 msgid "No data."
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:341
+#: admin/untappd-beer-search-top.php:353
 #: includes/untappd-beer-search-cpt.php:159
 msgid "Rating"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:342
+#: admin/untappd-beer-search-top.php:354
 msgid "Style"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:345
+#: admin/untappd-beer-search-top.php:357
 msgid "Availability"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:346
+#: admin/untappd-beer-search-top.php:358
 msgid "Updated"
 msgstr ""
 
@@ -341,11 +346,15 @@ msgstr ""
 msgid "<span class=\"dashicons dashicons-warning\"></span> Uploads directory not writable. Alko price sheet cannot be downloaded."
 msgstr ""
 
-#: includes/untappd-beer-search-alko.php:143
-msgid "⚠ Error saving Alko catalog to database."
+#: includes/untappd-beer-search-alko.php:61
+msgid "<span class=\"dashicons dashicons-warning\"></span> Unable to save price sheet file."
 msgstr ""
 
 #: includes/untappd-beer-search-alko.php:147
+msgid "⚠ Error saving Alko catalog to database."
+msgstr ""
+
+#: includes/untappd-beer-search-alko.php:151
 msgid "<span class=\"dashicons dashicons-warning\"></span> SimpleXLSX error: "
 msgstr ""
 
