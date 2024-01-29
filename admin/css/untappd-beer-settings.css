@@ -13,3 +13,7 @@ button + .spinner {
 p.ubs-fetch-wrapper.ubs-fetch-wrapper {
 	margin-top: .75rem;
 }
+
+#ubs-refetch-alko-prices {
+	margin-right: .5rem;
+}
