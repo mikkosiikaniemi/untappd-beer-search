@@ -3,6 +3,7 @@ jQuery(function ($) {
 	// Process search form submit action.
 	$('#ubs-search').on('submit', function (event, alko_id) {
 
+		$('.submit .button').prop('disabled', true);
 		$("#ubs-search .spinner").addClass("is-active");
 
 		var beer_name = $('#beer-name').val();
@@ -37,6 +38,7 @@ jQuery(function ($) {
 				$('button[data-post-id="' + selected_alko_id + '"]').hide();
 			}
 
+			$('.submit .button').prop('disabled', false);
 			$("#ubs-search .spinner").removeClass("is-active");
 		});
 
@@ -127,6 +129,7 @@ jQuery(function ($) {
 		element.preventDefault();
 
 		$("#ubs-search .spinner").addClass("is-active");
+		$('.submit .button').prop('disabled', true);
 
 		var data = {
 			action: 'ubs_populate_alko_product',
