@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-01-29T09:04:14+00:00\n"
+"POT-Creation-Date: 2024-01-30T09:01:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: ubs\n"
@@ -57,7 +57,7 @@ msgstr ""
 
 #: admin/untappd-beer-search-page.php:83
 #: admin/untappd-beer-search-page.php:196
-#: admin/untappd-beer-search-top.php:352
+#: admin/untappd-beer-search-top.php:382
 msgid "Beer Name"
 msgstr ""
 
@@ -65,12 +65,16 @@ msgstr ""
 msgid "Beer name..."
 msgstr ""
 
+#: admin/untappd-beer-search-page.php:86
+msgid "Populating..."
+msgstr ""
+
 #: admin/untappd-beer-search-page.php:102
 msgid "Search"
 msgstr ""
 
 #: admin/untappd-beer-search-page.php:108
-msgid "Populate"
+msgid "Populate and search"
 msgstr ""
 
 #. translators: amount of search results.
@@ -123,7 +127,7 @@ msgid "Beer Style"
 msgstr ""
 
 #: admin/untappd-beer-search-page.php:202
-#: admin/untappd-beer-search-top.php:355
+#: admin/untappd-beer-search-top.php:385
 #: includes/untappd-beer-search-cpt.php:149
 msgid "ABV%"
 msgstr ""
@@ -168,7 +172,7 @@ msgstr ""
 #: admin/untappd-beer-search-page.php:394
 #: admin/untappd-beer-search-page.php:426
 #: admin/untappd-beer-search-page.php:474
-#: admin/untappd-beer-search-top.php:392
+#: admin/untappd-beer-search-top.php:426
 #: includes/untappd-beer-search-alko.php:165
 msgid "Nonce check failed. Please reload the page and try again."
 msgstr ""
@@ -260,8 +264,8 @@ msgid "Alko online"
 msgstr ""
 
 #: admin/untappd-beer-search-top.php:77
-#: admin/untappd-beer-search-top.php:319
-#: admin/untappd-beer-search-top.php:323
+#: admin/untappd-beer-search-top.php:349
+#: admin/untappd-beer-search-top.php:353
 msgid "Update availability"
 msgstr ""
 
@@ -305,36 +309,40 @@ msgstr ""
 msgid "Top rated non-alcoholic beers"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:320
+#: admin/untappd-beer-search-top.php:342
+msgid "Top rated sour beers"
+msgstr ""
+
+#: admin/untappd-beer-search-top.php:350
 msgid "You can update availability of all beers in your favorite Alko store and Alko online. This may take a while."
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:326
+#: admin/untappd-beer-search-top.php:356
 msgid "Update progress:"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:328
+#: admin/untappd-beer-search-top.php:358
 msgid "Estimated time remaining: "
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:346
+#: admin/untappd-beer-search-top.php:376
 msgid "No data."
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:353
+#: admin/untappd-beer-search-top.php:383
 #: includes/untappd-beer-search-cpt.php:159
 msgid "Rating"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:354
+#: admin/untappd-beer-search-top.php:384
 msgid "Style"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:357
+#: admin/untappd-beer-search-top.php:387
 msgid "Availability"
 msgstr ""
 
-#: admin/untappd-beer-search-top.php:358
+#: admin/untappd-beer-search-top.php:388
 msgid "Updated"
 msgstr ""
 
@@ -351,7 +359,7 @@ msgid "<span class=\"dashicons dashicons-warning\"></span> Unable to save price 
 msgstr ""
 
 #: includes/untappd-beer-search-alko.php:147
-msgid "⚠ Error saving Alko catalog to database."
+msgid "🛈 Alko catalog not updated, probably already up-to-date."
 msgstr ""
 
 #: includes/untappd-beer-search-alko.php:151

@@ -105,7 +105,7 @@ function ubs_render_search_page() {
 				if ( count( $beers_alko ) < 1 ) {
 					echo 'disabled';}
 				?>
-				><?php esc_attr_e( 'Populate', 'ubs' ); ?></button>
+				><?php esc_attr_e( 'Populate and search', 'ubs' ); ?></button>
 				<span class="spinner"></span>
 				</p>
 		</form>

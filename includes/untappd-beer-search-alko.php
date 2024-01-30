@@ -144,7 +144,7 @@ function ubs_process_alko_price_sheet() {
 		if ( true === $updated_beers_option && true === $updated_beers_timestamp ) {
 			return wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), time() );
 		} else {
-			return new WP_Error( -4, __( '⚠ Error saving Alko catalog to database.', 'ubs' ) );
+			return new WP_Error( -4, __( '🛈 Alko catalog not updated, probably already up-to-date.', 'ubs' ) );
 		}
 	} else {
 		// If processing failed, return WP_Error.
