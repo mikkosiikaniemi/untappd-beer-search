@@ -32,3 +32,4 @@ require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-top.php';
 require_once plugin_dir_path( __FILE__ ) . 'admin/untappd-beer-search-settings.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-helpers.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-alko.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/untappd-beer-search-rest-endpoint.php';
