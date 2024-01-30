@@ -2,7 +2,7 @@
 
 A WordPress plugin for searching [Untappd](https://untappd.com) for beer info via [Untappd API](https://untappd.com/api/), and saving the information into a WordPress custom post type.
 
-A browser extension for Mozilla Firefox is included. The extension is able to inject the beer ratings to Alko website product catalog.
+A browser extension for Mozilla Firefox is included. The extension is able to inject the beer ratings to Alko website product catalog. Read more about [installing DIY extensions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension#installing) for Firefox.
 
 Contains ability to import [Alko product catalog](https://www.alko.fi/valikoimat-ja-hinnasto/hinnasto) and use it to autocomplete beer search against the Alko catalog.
 
