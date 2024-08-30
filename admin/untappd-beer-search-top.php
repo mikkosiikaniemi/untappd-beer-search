@@ -95,7 +95,7 @@ function ubs_render_top_beers_page() {
 
 			$top_available_beers_query = new WP_Query(
 				array(
-					'posts_per_page'         => 10,
+					'posts_per_page'         => 20,
 					'post_type'              => 'beer',
 					'meta_key'               => 'rating_score',
 					'orderby'                => 'meta_value_num',
@@ -116,6 +116,36 @@ function ubs_render_top_beers_page() {
 			<h2><?php esc_html_e( 'Top beers', 'ubs' ); ?></h2>
 			<p><?php esc_html_e( 'These beers are available & ranked highest in your favorite Alko store.', 'ubs' ); ?></p>
 			<?php ubs_render_beer_listing( $top_available_beers_query, $favorite_alko_store ); ?>
+
+			<?php
+			$top_available_medium_high_beers_query = new WP_Query(
+				array(
+					'posts_per_page'         => 15,
+					'post_type'              => 'beer',
+					'meta_key'               => 'rating_score',
+					'orderby'                => 'meta_value_num',
+					'order'                  => 'DESC',
+					'meta_query'             => array(
+						'relation' => 'AND',
+						array(
+							'key'     => 'availability_' . $favorite_alko_store,
+							'value'   => 0,
+							'compare' => '>',
+						),
+						array(
+							'key'     => 'beer_abv',
+							'value'   => 10,
+							'compare' => '<=',
+							'type'    => 'DECIMAL',
+						),
+					),
+					'no_found_rows'          => true,
+					'update_post_term_cache' => false,
+				)
+			);
+			?>
+			<h2><?php esc_html_e( 'Top "less than 10%" beers', 'ubs' ); ?></h2>
+			<?php ubs_render_beer_listing( $top_available_medium_high_beers_query, $favorite_alko_store ); ?>
 
 			<?php
 			$top_available_medium_beers_query = new WP_Query(
