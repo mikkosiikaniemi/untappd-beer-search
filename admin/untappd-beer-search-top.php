@@ -459,7 +459,17 @@ function ubs_update_availability_ajax() {
 
 	// For earch beer, update availability.
 	foreach ( $beer_query->posts as $beer_post_id ) {
-		if ( current_time( 'timestamp' ) - get_post_meta( $beer_post_id, 'availability_updated_' . $favorite_alko_store, true ) > HOUR_IN_SECONDS ) {
+
+		// Get the updated timestamp.
+		$availability_updated = get_post_meta( $beer_post_id, 'availability_updated_' . $favorite_alko_store, true );
+
+		// If no timestamp exists, probably a fresh start with new favorite alko ID.
+		if ( empty( $availability_updated ) ) {
+			ubs_update_store_availability_for_beer( $beer_post_id );
+			continue;
+		}
+
+		if ( current_time( 'timestamp' ) - $availability_updated > HOUR_IN_SECONDS ) {
 			ubs_update_store_availability_for_beer( $beer_post_id );
 		}
 	};
