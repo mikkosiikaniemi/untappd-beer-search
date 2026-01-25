@@ -87,12 +87,15 @@ function ubs_search_alko_catalog_for_name( $beer_name_to_search ) {
 	$return_results = array();
 
 	// Loop through beers and calculate Levenshtein distance between names.
-	foreach ( $beers as $alko_id => $beer_name ) {
-
-		$matches[ $alko_id ]['alko_id']      = $alko_id;
-		$matches[ $alko_id ]['beer_name']    = $beer_name;
-		$matches[ $alko_id ]['levenshtein']  = levenshtein( $beer_name_to_search, $beer_name, 1, 10, 10 );
-		$matches[ $alko_id ]['similar_text'] = similar_text( $beer_name_to_search, $beer_name );
+	foreach ( $beers as $alko_id => $beer_data ) {
+		$matches[ $alko_id ]['alko_id']         = $alko_id;
+		$matches[ $alko_id ]['beer_name']       = $beer_data['beer_name'];
+		$matches[ $alko_id ]['brewery']         = $beer_data['brewery'];
+		$matches[ $alko_id ]['bottle_size']     = $beer_data['bottle_size'];
+		$matches[ $alko_id ]['price']           = $beer_data['price'];
+		$matches[ $alko_id ]['price_per_liter'] = $beer_data['price_per_liter'];
+		$matches[ $alko_id ]['levenshtein']     = levenshtein( $beer_name_to_search, $beer_data['beer_name'], 1, 10, 10 );
+		$matches[ $alko_id ]['similar_text']    = similar_text( $beer_name_to_search, $beer_data['beer_name'] );
 	}
 
 	// Sort matches in ascending order by Levenshtein distance.

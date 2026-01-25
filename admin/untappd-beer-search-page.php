@@ -61,7 +61,7 @@ function ubs_render_search_page() {
 			$saved_beers = ubs_get_saved_beers_alko_ids();
 
 			// Determine the number of unsaved beers.
-			foreach ( $beers_alko as $beer_alko_id => $beer_name ) {
+			foreach ( $beers_alko as $beer_alko_id => $beer_data ) {
 				if ( false !== in_array( $beer_alko_id, $saved_beers, true ) ) {
 					unset( $beers_alko[ $beer_alko_id ] );
 				}
@@ -88,8 +88,8 @@ function ubs_render_search_page() {
 							<?php
 							$beers = get_option( 'ubs_beers' );
 							if ( false !== $beers && false === empty( $beers ) ) {
-								foreach ( $beers as $alko_id => $beer_name ) {
-									echo '<option data-alko-id="' . absint( $alko_id ) . '">' . esc_attr( $beer_name ) . '</option>';
+								foreach ( $beers as $alko_id => $beer_data ) {
+									echo '<option data-alko-id="' . absint( $alko_id ) . '">' . esc_attr( $beer_data['beer_name'] ) . '</option>';
 								}
 							}
 							?>
@@ -436,17 +436,29 @@ function ubs_populate_search_field_with_alko_product() {
 	foreach ( $saved_alko_beers_ids as $alko_id ) {
 		unset( $beers[ $alko_id ] );
 	}
-	asort( $beers );
+
+	// Sort by beer name for consistency.
+	usort(
+		$beers,
+		function( $a, $b ) {
+			return strcmp( $a['beer_name'], $b['beer_name'] );
+		}
+	);
 
 	$number_of_beers_left_to_save = count( $beers );
 
 	for ( $i = 0; $i < $number_of_beers_left_to_save; $i++ ) {
 		$random_beer_id = array_rand( $beers );
-		if ( false === get_post_status( ubs_maybe_get_beer_cpt_id( $random_beer_id, 'alko' ) ) ) {
+		$beer_data = $beers[ $random_beer_id ];
+		$alko_id = is_array($beer_data) ? $random_beer_id : $beer_data;
+		if ( false === get_post_status( ubs_maybe_get_beer_cpt_id( $alko_id, 'alko' ) ) ) {
 			wp_send_json_success(
 				array(
-					'alko_id'            => $random_beer_id,
-					'beer_name'          => html_entity_decode( $beers[ $random_beer_id ], ENT_QUOTES, 'UTF-8' ),
+					'alko_id'            => $alko_id,
+					'beer_name'          => html_entity_decode( $beer_data['beer_name'], ENT_QUOTES, 'UTF-8' ),
+					'bottle_size'        => $beer_data['bottle_size'],
+					'price'              => $beer_data['price'],
+					'price_per_liter'    => $beer_data['price_per_liter'],
 					'beers_left_to_save' => $number_of_beers_left_to_save,
 				)
 			);

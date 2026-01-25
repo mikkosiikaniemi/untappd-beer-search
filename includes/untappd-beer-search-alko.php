@@ -108,8 +108,11 @@ function ubs_process_alko_price_sheet() {
 
 			// Beers are categorized with code '600'.
 			if ( '600' === $row[ $price_list_category_index ] || false === empty( $row[ $beer_wort_abv_index ] ) ) {
-				$beer_name = esc_attr( $row[1] );
-				$brewery   = esc_attr( $row[2] );
+				$beer_name       = esc_attr( $row[1] );
+				$brewery         = esc_attr( $row[2] );
+				$bottle_size     = isset( $row[3] ) ? esc_attr( $row[3] ) : '';
+				$price           = isset( $row[4] ) ? esc_attr( $row[4] ) : '';
+				$price_per_liter = isset( $row[5] ) ? esc_attr( $row[5] ) : '';
 
 				// Check if product name contains suffix to skip.
 				$skip_product = false;
@@ -132,7 +135,13 @@ function ubs_process_alko_price_sheet() {
 					}
 				}
 
-				$beers[ absint( $row[0] ) ] = $beer_name;
+				$beers[ absint( $row[0] ) ] = array(
+					'beer_name'       => $beer_name,
+					'brewery'         => $brewery,
+					'bottle_size'     => $bottle_size,
+					'price'           => $price,
+					'price_per_liter' => $price_per_liter,
+				);
 			}
 		}
 
