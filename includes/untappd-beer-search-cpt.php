@@ -371,6 +371,24 @@ function ubs_save_beer( $beer_data, $alko_id = false ) {
 	unset( $post_meta['checkins'] );
 	unset( $post_meta['similar'] );
 	unset( $post_meta['friends'] );
+
+	// Add Alko meta if available from the catalog (if not already present in $beer_data).
+	if ( isset( $beer_data['alko_id'] ) && ! empty( $beer_data['alko_id'] ) ) {
+		$alko_catalog = get_option( 'ubs_beers' );
+		if ( isset( $alko_catalog[ $beer_data['alko_id'] ] ) ) {
+			$alko_info = $alko_catalog[ $beer_data['alko_id'] ];
+			if ( isset( $alko_info['bottle_size'] ) ) {
+				$post_meta['bottle_size'] = $alko_info['bottle_size'];
+			}
+			if ( isset( $alko_info['price'] ) ) {
+				$post_meta['price'] = $alko_info['price'];
+			}
+			if ( isset( $alko_info['price_per_liter'] ) ) {
+				$post_meta['price_per_liter'] = $alko_info['price_per_liter'];
+			}
+		}
+	}
+
 	$post_data['meta_input'] = $post_meta;
 
 	/**
