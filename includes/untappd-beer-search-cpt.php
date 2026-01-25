@@ -600,6 +600,9 @@ function ubs_update_store_availability_for_beer( $post_id ) {
 	// Get beer info from Untappd.
 	$alko_availability   = ubs_update_alko_availability( $alko_id, $post_id );
 	$online_availability = ubs_update_alko_online_availability( $alko_id, $post_id );
+
+	// Update Alko meta at the same time, too.
+	ubs_update_alko_meta_from_catalog( $alko_id, $post_id );
 }
 
 /**

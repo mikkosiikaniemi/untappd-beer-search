@@ -186,3 +186,31 @@ function ubs_get_saved_beers_alko_ids() {
 
 	return $alko_ids;
 }
+
+/**
+ * Update Alko meta info from catalog for a given beer.
+ *
+ * @param  int $alko_id Alko product number.
+ * @param  int $post_id Post ID to update.
+ */
+function ubs_update_alko_meta_from_catalog( $alko_id, $post_id ) {
+	$beers = get_option( 'ubs_beers' );
+
+	// If beer not found in catalog, bail out.
+	if ( false === isset( $beers[ $alko_id ] ) ) {
+		return;
+	}
+
+	// Meta keys to update.
+	$meta_keys_to_update = array(
+		'bottle_size',
+		'price',
+		'price_per_liter',
+	);
+
+	foreach ( $meta_keys_to_update as $meta_key ) {
+		if ( isset( $beers[ $alko_id ][ $meta_key ] ) ) {
+			update_post_meta( $post_id, $meta_key, sanitize_text_field( $beers[ $alko_id ][ $meta_key ] ) );
+		}
+	}
+}
