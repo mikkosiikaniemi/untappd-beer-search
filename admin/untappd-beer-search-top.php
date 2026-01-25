@@ -443,6 +443,9 @@ function ubs_render_beer_listing( $beer_query, $favorite_alko_store = false ) {
 			<th><?php esc_html_e( 'Rating', 'ubs' ); ?></th>
 			<th><?php esc_html_e( 'Style', 'ubs' ); ?></th>
 			<th><?php esc_html_e( 'ABV%', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Price', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Price per liter', 'ubs' ); ?></th>
+			<th><?php esc_html_e( 'Bottle size', 'ubs' ); ?></th>
 		<?php if ( false !== $favorite_alko_store ) : ?>
 			<th><?php esc_html_e( 'Availability', 'ubs' ); ?></th>
 			<th  class="sorter-shortDate" data-date-format="ddmmyyyy"><?php esc_html_e( 'Updated', 'ubs' ); ?></th>
@@ -456,10 +459,28 @@ function ubs_render_beer_listing( $beer_query, $favorite_alko_store = false ) {
 
 			$beer_slug = get_post_meta( $beer_post->ID, 'beer_slug', true );
 			$beer_id   = get_post_meta( $beer_post->ID, 'bid', true );
+
+			$beer_price = get_post_meta( $beer_post->ID, 'price', true );
+			if ( empty( $beer_price ) ) {
+				$beer_price = '';
+			} else {
+				$beer_price = number_format( $beer_price, 1 );
+			}
+
+			$beer_price_per_liter = get_post_meta( $beer_post->ID, 'price_per_liter', true );
+			if ( empty( $beer_price_per_liter ) ) {
+				$beer_price_per_liter = '';
+			} else {
+				$beer_price_per_liter = number_format( $beer_price_per_liter, 1 );
+			}
+
 			echo '<td><a target="_blank" href="' . esc_url( 'https://untappd.com/b/' . $beer_slug . '/' . $beer_id ) . '">' . number_format( get_post_meta( $beer_post->ID, 'rating_score', true ), 2 ) . '</a></td>';
 
 			echo '<td>' . esc_attr( get_post_meta( $beer_post->ID, 'beer_style', true ) ) . '</td>';
 			echo '<td>' . number_format( get_post_meta( $beer_post->ID, 'beer_abv', true ), 1 ) . '</td>';
+			echo '<td>' . esc_attr( $beer_price ) . '</td>';
+			echo '<td>' . esc_attr( $beer_price_per_liter ) . '</td>';
+			echo '<td>' . esc_attr( get_post_meta( $beer_post->ID, 'bottle_size', true ) ) . '</td>';
 			if ( false !== $favorite_alko_store ) {
 				echo '<td>' . absint( get_post_meta( $beer_post->ID, 'availability_' . $favorite_alko_store, true ) ) . '</td>';
 				echo '<td>' . esc_attr( date( 'j.n.Y H:i', get_post_meta( $beer_post->ID, 'availability_updated_' . $favorite_alko_store, true ) ) ) . '</td>';
