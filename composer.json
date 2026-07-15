@@ -2,7 +2,8 @@
     "name": "mikko.siikaniemi/untappd-beer-search",
     "description": "Untappd Beer Search for WordPress",
     "require": {
-        "shuchkin/simplexlsx": "^1.0"
+        "shuchkin/simplexlsx": "^1.0",
+        "symfony/polyfill-mbstring": "^1.38"
     },
     "authors": [
         {
