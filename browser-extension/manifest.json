@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Untappd Beer Ratings for Alko",
-  "version": "1.0",
+  "version": "2.0",
 
   "description": "Show Untappd beer ratings in Alko website product catalog.",
 
@@ -18,7 +18,8 @@
   ],
 
   "permissions": [
-    "https://demo.local/"
+    "http://untappd.local/",
+    "https://untappd.local/"
   ]
 
 }
