@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "shuchkin/simplexlsx",
-            "version": "1.1.18",
+            "version": "1.1.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shuchkin/simplexlsx.git",
-                "reference": "40386bd81aaf89ba485cee8990ce91a19d91dc07"
+                "reference": "aa94c940c46ec5ee545ed1808c2aefeb26767cf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shuchkin/simplexlsx/zipball/40386bd81aaf89ba485cee8990ce91a19d91dc07",
-                "reference": "40386bd81aaf89ba485cee8990ce91a19d91dc07",
+                "url": "https://api.github.com/repos/shuchkin/simplexlsx/zipball/aa94c940c46ec5ee545ed1808c2aefeb26767cf8",
+                "reference": "aa94c940c46ec5ee545ed1808c2aefeb26767cf8",
                 "shasum": ""
             },
             "require": {
@@ -56,9 +56,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shuchkin/simplexlsx/issues",
-                "source": "https://github.com/shuchkin/simplexlsx/tree/1.1.18"
+                "source": "https://github.com/shuchkin/simplexlsx/tree/1.1.19"
             },
-            "time": "2026-09-05T06:35:36+00:00"
+            "time": "2026-09-10T06:32:09+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
